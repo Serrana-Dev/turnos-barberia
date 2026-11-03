@@ -8,7 +8,7 @@ export function BarraDemo({ a = '/admin', texto = 'Ver el panel del negocio' }: 
   return (
     <div className="barra-demo">
       <p>
-        Demo de {PRODUCTO} para {negocio.nombre}. Las reservas son de prueba.
+        Demo<span className="demo-detalle"> de {PRODUCTO} para {negocio.nombre}. Las reservas son de prueba.</span>
       </p>
       <Link to={a}>{texto}</Link>
     </div>
