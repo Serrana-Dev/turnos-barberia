@@ -58,7 +58,7 @@
   fill: #000;
   stroke: var(--marca-tenue);
   stroke-width: 5;
-  filter: drop-shadow(0 0 5px rgb(143 130 255 / 0.9));
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--marca) 90%, transparent));
 }
 .admin .logo-tijera {
   stroke: #fff;
@@ -620,8 +620,8 @@
   color: var(--tenue);
 }
 .sillon-estado.ocupado {
-  background: rgb(143 130 255 / 0.18);
-  color: #c7c0ff;
+  background: color-mix(in srgb, var(--marca) 22%, transparent);
+  color: var(--marca-tenue);
 }
 .sillon-turno {
   display: grid;
@@ -2174,6 +2174,8 @@
   .superior-detalle {
     display: none;
   }
+}
+
 /* ——— Agenda en el celular: días, barberos y la lista del día ——— */
 .am {
   display: flex;
@@ -3069,4 +3071,119 @@ html {
   .am-mas {
     transition: none;
   }
+}
+
+/* ——— Hoy: la tarjeta del día, en el color de la marca ——— */
+.hoy-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 22px 22px 18px;
+  overflow: hidden;
+  border-radius: 22px;
+  background:
+    radial-gradient(120% 120% at 100% 0%, color-mix(in srgb, var(--marca) 70%, transparent), transparent 60%),
+    var(--marco);
+  color: #fff;
+}
+.hoy-saludo {
+  margin: 0;
+  font-size: 15px;
+  color: var(--marca-tenue);
+  font-weight: 600;
+}
+.hoy-plata {
+  display: flex;
+  flex-direction: column;
+  margin: 6px 0 0;
+}
+.hoy-plata small {
+  font-size: 13px;
+  color: #b9b6cc;
+}
+.hoy-plata strong {
+  font-size: clamp(40px, 9vw, 56px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.hoy-compara {
+  margin: 0;
+  font-size: 14px;
+  color: #b9b6cc;
+}
+.hoy-compara.sube {
+  color: #6ee7a8;
+}
+.hoy-compara.baja {
+  color: #ff9b8f;
+}
+.hoy-avance {
+  display: flex;
+  gap: 3px;
+  margin-top: 14px;
+}
+.hoy-avance span {
+  flex: 1;
+  height: 8px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 0.14);
+}
+.hoy-avance span.hecho {
+  background: var(--marca);
+}
+.hoy-avance span.ahora {
+  background: #fff;
+}
+.hoy-cuenta {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #b9b6cc;
+}
+.hoy-proximo {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.1);
+  font: inherit;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.hoy-proximo:active {
+  transform: scale(0.98);
+}
+.hoy-proximo-hora {
+  font-size: 20px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.hoy-proximo strong {
+  display: block;
+  font-size: 15px;
+}
+.hoy-proximo small {
+  display: block;
+  font-size: 13px;
+  color: #b9b6cc;
+}
+.hoy-proximo-falta {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--marca);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.kpis-dos {
+  grid-template-columns: 1fr 1fr;
 }

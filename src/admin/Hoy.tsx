@@ -82,23 +82,49 @@ export default function Hoy() {
         </div>
       </div>
 
-      <div className="kpis">
-        <div className="kpi">
-          <span>Turnos de hoy</span>
-          <strong>{d.deHoy.length}</strong>
-          <small>{d.atendidos} atendidos, {d.deHoy.length - d.atendidos} por atender</small>
-        </div>
-        <div className="kpi">
-          <span>Cobrado hasta ahora</span>
+      <section className="hoy-hero" aria-label="Resumen del día">
+        <p className="hoy-saludo">
+          {ahora < 780 ? 'Buen día' : ahora < 1200 ? 'Buenas tardes' : 'Buenas noches'}, {negocio.dueño}
+        </p>
+        <p className="hoy-plata">
+          <small>Cobrado hoy</small>
           <strong>{pesos(d.cobrado)}</strong>
-          {abreA !== null ? (
-            <small>Abre a las {hora(abreA)}</small>
-          ) : (
-            <small className={diferencia >= 0 ? 'bien' : 'mal'}>
-              {diferencia >= 0 ? '+' : '−'}{pesos(Math.abs(diferencia))} contra el {fechaLarga(semanaPasada).split(' ')[0]} pasado a esta hora
-            </small>
-          )}
+        </p>
+        {abreA !== null ? (
+          <p className="hoy-compara">Abre a las {hora(abreA)}</p>
+        ) : (
+          <p className={`hoy-compara ${diferencia >= 0 ? 'sube' : 'baja'}`}>
+            {diferencia >= 0 ? '+' : '−'}{pesos(Math.abs(diferencia))} contra el {fechaLarga(semanaPasada).split(' ')[0]} pasado a esta hora
+          </p>
+        )}
+        <div className="hoy-avance" aria-label={`${d.atendidos} de ${d.deHoy.length} turnos atendidos`}>
+          {d.deHoy
+            .slice()
+            .sort((x, y) => x.inicio - y.inicio)
+            .map((t) => (
+              <span key={t.id} className={t.estado === 'atendido' ? 'hecho' : t.inicio <= ahora ? 'ahora' : ''} />
+            ))}
         </div>
+        <p className="hoy-cuenta">
+          {d.atendidos} de {d.deHoy.length} turnos atendidos, faltan {pesos(d.previsto)}
+        </p>
+        {d.proximos[0] && (
+          <button className="hoy-proximo" onClick={() => verTurno(d.proximos[0].id)}>
+            <span className="hoy-proximo-hora">{hora(d.proximos[0].inicio)}</span>
+            <span>
+              <strong>{ix.cliente[d.proximos[0].clienteId]?.nombre}</strong>
+              <small>
+                {ix.servicio[d.proximos[0].servicioId]?.nombre} con {ix.barbero[d.proximos[0].barberoId]?.nombre}
+              </small>
+            </span>
+            <span className="hoy-proximo-falta">
+              {d.proximos[0].inicio <= ahora ? 'Ahora' : d.proximos[0].inicio - ahora < 60 ? `En ${d.proximos[0].inicio - ahora} min` : `En ${Math.floor((d.proximos[0].inicio - ahora) / 60)} h`}
+            </span>
+          </button>
+        )}
+      </section>
+
+      <div className="kpis kpis-dos">
         <div className="kpi">
           <span>Por cobrar hoy</span>
           <strong>{pesos(d.previsto)}</strong>

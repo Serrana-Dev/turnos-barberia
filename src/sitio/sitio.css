@@ -1275,3 +1275,162 @@
     padding-block: 10px;
   }
 }
+
+/* ——— Turno confirmado: el tilde que se dibuja y lo que le llega por WhatsApp ——— */
+.confirmado {
+  align-items: flex-start;
+  border-top: 6px solid var(--violeta);
+}
+.confirmado-check {
+  width: 64px;
+  height: 64px;
+}
+.confirmado-check circle {
+  fill: var(--violeta);
+  transform-origin: center;
+  animation: check-circulo 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.confirmado-check path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: check-trazo 360ms 260ms ease-out forwards;
+}
+@keyframes check-circulo {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+@keyframes check-trazo {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.confirmado .confirmado-acciones,
+.confirmado .confirmado-datos {
+  width: 100%;
+}
+.confirmado .confirmado-acciones .btn {
+  gap: 8px;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+.wa {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 14px;
+  background: var(--fondo);
+}
+.wa-titulo {
+  font-weight: 700;
+  font-size: 17px;
+}
+.wa-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 12px;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 20% 20%, rgb(0 0 0 / 0.035) 1px, transparent 1.5px) 0 0 / 18px 18px,
+    #efe7de;
+}
+.wa-dia {
+  align-self: center;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.85);
+  font-size: 12px;
+  color: #54656f;
+}
+.wa-burbuja {
+  position: relative;
+  align-self: flex-start;
+  max-width: 88%;
+  padding: 8px 10px 20px;
+  border-radius: 4px 12px 12px 12px;
+  background: #fff;
+  color: #111b21;
+  font-size: 15px;
+  line-height: 1.4;
+  box-shadow: 0 1px 1px rgb(0 0 0 / 0.08);
+  animation: burbuja 300ms var(--ease) both;
+}
+.wa-burbuja:nth-of-type(4) {
+  animation-delay: 500ms;
+}
+.wa-mia {
+  align-self: flex-end;
+  min-width: 70px;
+  border-radius: 12px 4px 12px 12px;
+  background: #d9fdd3;
+  animation-delay: 800ms;
+}
+.wa-burbuja time {
+  position: absolute;
+  right: 8px;
+  bottom: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: #667781;
+}
+.wa-burbuja time svg {
+  color: #53bdeb;
+}
+@keyframes burbuja {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+.wa-nota {
+  font-size: 14px;
+  color: var(--gris);
+}
+@media (prefers-reduced-motion: reduce) {
+  .confirmado-check circle,
+  .confirmado-check path,
+  .wa-burbuja {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ——— Portada en el celular: las fotos se deslizan como un carrusel ——— */
+@media (max-width: 900px) {
+  .portada-fotos {
+    display: flex;
+    gap: 10px;
+    margin: 0 -16px;
+    padding: 0 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 16px;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .portada-fotos::-webkit-scrollbar {
+    display: none;
+  }
+  .portada-fotos img,
+  .portada-fotos img:nth-child(2),
+  .portada-fotos img:nth-child(3) {
+    flex: 0 0 78%;
+    margin-top: 0;
+    aspect-ratio: 4 / 5;
+    border-radius: 20px;
+    scroll-snap-align: start;
+  }
+  .portada-texto {
+    margin-top: 0;
+  }
+}

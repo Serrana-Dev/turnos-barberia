@@ -4,7 +4,7 @@ import { negocio, type SucursalId } from '../config/negocio'
 import { duracion, fechaCorta, fechaLarga, fechaRelativa, hora, hoyClave, pesos, sumarDias, capital } from '../lib/formato'
 import { abierto, crearCliente, crearTurno, huecos, useDemo } from '../lib/store'
 import type { Turno } from '../lib/tipos'
-import { ChevronLeft } from 'lucide-react'
+import { CalendarPlus, CheckCheck, ChevronLeft, MapPin } from 'lucide-react'
 import { Logo } from '../lib/ui'
 import { BarraDemo } from './comun'
 
@@ -42,6 +42,30 @@ function Paso({
       {abiertoPaso && <div className="paso-cuerpo">{children}</div>}
     </section>
   )
+}
+
+/** El turno como evento de calendario (.ics), para agendarlo en el celular con un toque. */
+function enlaceCalendario(t: Turno, titulo: string, lugar: string) {
+  const fecha = (min: number) => `${t.dia.replace(/-/g, '')}T${String(Math.floor(min / 60)).padStart(2, '0')}${String(min % 60).padStart(2, '0')}00`
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Sillon//Turnos//ES',
+    'BEGIN:VEVENT',
+    `UID:${t.id}@sillon`,
+    `DTSTART:${fecha(t.inicio)}`,
+    `DTEND:${fecha(t.inicio + t.duracion)}`,
+    `SUMMARY:${titulo}`,
+    `LOCATION:${lugar}`,
+    'BEGIN:VALARM',
+    'TRIGGER:-PT2H',
+    'ACTION:DISPLAY',
+    `DESCRIPTION:${titulo}`,
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n')
+  return `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`
 }
 
 function CabeceraReserva() {
@@ -133,6 +157,10 @@ export default function Reservar() {
         <CabeceraReserva />
         <main className="reservar-cuerpo">
           <section className="confirmado" aria-live="polite">
+            <svg className="confirmado-check" viewBox="0 0 52 52" aria-hidden="true">
+              <circle cx="26" cy="26" r="24" />
+              <path d="M15 27l7 7 15-16" />
+            </svg>
             <p className="confirmado-sello">Turno confirmado</p>
             <h1>
               {capital(fechaRelativa(hecho.dia) === 'hoy' || fechaRelativa(hecho.dia) === 'mañana' ? fechaRelativa(hecho.dia) : fechaLarga(hecho.dia))} a las {hora(hecho.inicio)}
@@ -144,11 +172,44 @@ export default function Reservar() {
               <div><dt>A nombre de</dt><dd>{nombre}</dd></div>
               <div><dt>Número</dt><dd>{hecho.numero}</dd></div>
             </dl>
-            <p>Te mandamos un recordatorio por WhatsApp el día anterior. Si no podés venir, avisanos y liberamos el lugar.</p>
             <div className="confirmado-acciones">
-              <a className="btn btn-primario" href={sc.mapa} target="_blank" rel="noreferrer">Cómo llegar</a>
-              <Link className="btn btn-secundario" to="/">Volver al inicio</Link>
+              <a
+                className="btn btn-primario"
+                href={enlaceCalendario(hecho, `${sv.nombre} con ${b.nombre}, ${negocio.nombre}`, `${sc.direccion}, ${sc.ciudad}`)}
+                download={`turno-${hecho.numero}.ics`}
+              >
+                <CalendarPlus size={18} aria-hidden="true" /> Agendar
+              </a>
+              <a className="btn btn-secundario" href={sc.mapa} target="_blank" rel="noreferrer">
+                <MapPin size={18} aria-hidden="true" /> Cómo llegar
+              </a>
             </div>
+          </section>
+
+          <section className="wa" aria-label="Lo que te llega por WhatsApp">
+            <p className="wa-titulo">Lo que te llega por WhatsApp</p>
+            <div className="wa-chat">
+              <p className="wa-dia">Ahora</p>
+              <p className="wa-burbuja">
+                ¡Listo, {nombre.split(' ')[0]}! Tu turno quedó para {fechaRelativa(hecho.dia)} a las {hora(hecho.inicio)} con {b.nombre}, en {sc.direccion}. Número {hecho.numero}.
+                <time>
+                  {hora(Math.min(1439, new Date().getHours() * 60 + new Date().getMinutes()))} <CheckCheck size={14} aria-hidden="true" />
+                </time>
+              </p>
+              <p className="wa-dia">El día anterior</p>
+              <p className="wa-burbuja">
+                Hola {nombre.split(' ')[0]}, te esperamos mañana a las {hora(hecho.inicio)} para {sv.nombre.toLowerCase()} con {b.nombre}. ¿Venís? Respondé SÍ o NO.
+                <time>
+                  10:00 <CheckCheck size={14} aria-hidden="true" />
+                </time>
+              </p>
+              <p className="wa-burbuja wa-mia">
+                SÍ
+                <time>10:02</time>
+              </p>
+            </div>
+            <p className="wa-nota">Si respondés NO, el lugar se libera solo y lo puede tomar otro.</p>
+            <Link className="btn btn-secundario btn-ancho" to="/">Volver al inicio</Link>
           </section>
         </main>
       </div>
