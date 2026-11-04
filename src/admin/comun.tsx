@@ -1,6 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { useOutletContext } from 'react-router-dom'
-import { negocio, type Barbero, type SucursalId } from '../config/negocio'
+import { personaDe, puedeHacer, negocio, type Barbero, type SucursalId } from '../config/negocio'
 import { capital, duracion, fechaRelativa, hora, iniciales, pesos } from '../lib/formato'
 import { actualizarTurno, cobrarTurno, crearCliente, crearTurno, huecos, leer, useDemo } from '../lib/store'
 import { estados, metodos, origenes, type Estado, type MetodoPago, type Turno } from '../lib/tipos'
@@ -58,7 +58,7 @@ export function DetalleTurno({ id, cerrar }: { id: string | null; cerrar: () => 
       <dl className="ficha">
         <div><dt>Servicio</dt><dd>{s.nombre} · {duracion(t.duracion)}</dd></div>
         <div><dt>Precio</dt><dd>{pesos(t.precio)}</dd></div>
-        <div><dt>Barbero</dt><dd>{b.nombre}</dd></div>
+        <div><dt>{personaDe(negocio)[0]}</dt><dd>{b.nombre}</dd></div>
         <div><dt>Día</dt><dd>{capital(fechaRelativa(t.dia))}, {negocio.sucursales.find((x) => x.id === t.sucursal)!.nombre}</dd></div>
         <div><dt>Reservó por</dt><dd>{origenes[t.origen]} · turno N° {t.numero}</dd></div>
         <div><dt>Estado</dt><dd><Marca estado={t.estado} />{t.pago && ` · ${metodos[t.pago]}`}</dd></div>
@@ -117,7 +117,7 @@ function FormNuevoTurno({ inicial, cerrar }: { inicial: NuevoTurnoDatos; cerrar:
   const coincidencias = cliente.length > 1 ? e.clientes.filter((c) => c.nombre.toLowerCase().includes(cliente.toLowerCase())).slice(0, 4) : []
   const libres = huecos(e, d.sucursal, d.dia, d.servicioId, d.barberoId)
   const ocupado = !libres.some((h) => h.inicio === d.inicio)
-  const equipo = e.equipo.filter((b) => b.sucursal === d.sucursal)
+  const equipo = e.equipo.filter((b) => b.sucursal === d.sucursal && puedeHacer(b, e.servicios.find((s) => s.id === d.servicioId)))
 
   function guardar(ev: FormEvent) {
     ev.preventDefault()
@@ -145,12 +145,17 @@ function FormNuevoTurno({ inicial, cerrar }: { inicial: NuevoTurnoDatos; cerrar:
       <div className="campos-2">
         <label className="campo">
           Servicio
-          <select value={d.servicioId} onChange={(ev) => setD({ ...d, servicioId: ev.target.value })}>
+          <select value={d.servicioId} onChange={(ev) => {
+            const sv = e.servicios.find((s) => s.id === ev.target.value)
+            const actual = e.equipo.find((b) => b.id === d.barberoId)
+            const otro = e.equipo.find((b) => b.sucursal === d.sucursal && puedeHacer(b, sv))
+            setD({ ...d, servicioId: ev.target.value, barberoId: actual && puedeHacer(actual, sv) ? d.barberoId : (otro?.id ?? d.barberoId) })
+          }}>
             {e.servicios.map((s) => <option key={s.id} value={s.id}>{s.nombre} · {pesos(s.precio)}</option>)}
           </select>
         </label>
         <label className="campo">
-          Barbero
+          {personaDe(negocio)[0]}
           <select value={d.barberoId} onChange={(ev) => setD({ ...d, barberoId: ev.target.value })}>
             {equipo.map((b) => <option key={b.id} value={b.id}>{b.nombre}</option>)}
           </select>

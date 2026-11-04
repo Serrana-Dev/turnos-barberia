@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && vite build --mode ayrton --outDir dist/ayrton",
+    "build": "tsc -b && vite build && vite build --mode ayrton --outDir dist/ayrton && vite build --mode rene --outDir dist/rene",
     "lint": "eslint .",
     "preview": "vite preview"
   },

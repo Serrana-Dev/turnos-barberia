@@ -10,6 +10,7 @@ import Reportes from './admin/Reportes'
 import { Ajustes, Equipo, Servicios } from './admin/Catalogo'
 import './sitio/sitio.css'
 import './admin/admin.css'
+import './sitio/rene.css'
 
 // HashRouter: así funciona en GitHub Pages sin configurar el servidor.
 export default function App() {

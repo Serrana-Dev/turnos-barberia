@@ -1,6 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { negocio, type Servicio } from '../config/negocio'
+import { gruposDe, personaDe, negocio, type Servicio } from '../config/negocio'
 import { duracion, hoyClave, pesos, sumarDias } from '../lib/formato'
 import { actualizarBarbero, actualizarProducto, actualizarServicio, agregarServicio, useDemo } from '../lib/store'
 import { Dialogo } from '../lib/ui'
@@ -110,7 +110,7 @@ function FormServicio({ s, cerrar }: { s: Servicio | null; cerrar: () => void })
         <label className="campo">
           Tipo
           <select value={d.grupo} onChange={(ev) => setD({ ...d, grupo: ev.target.value as Servicio['grupo'] })}>
-            <option>Corte</option><option>Barba</option><option>Color</option>
+            {gruposDe(negocio).map(([g]) => <option key={g}>{g}</option>)}
           </select>
         </label>
       </div>
@@ -162,7 +162,7 @@ export function Equipo() {
       </div>
       <table className="tabla tabla-equipo">
         <thead>
-          <tr><th>Barbero</th><th>Sucursal</th><th className="num">Turnos del mes</th><th className="num">Facturado</th><th className="num">Comisión</th><th className="num">A pagar</th></tr>
+          <tr><th>{personaDe(negocio)[0]}</th><th>Sucursal</th><th className="num">Turnos del mes</th><th className="num">Facturado</th><th className="num">Comisión</th><th className="num">A pagar</th></tr>
         </thead>
         <tbody>
           {e.equipo.map((b) => {

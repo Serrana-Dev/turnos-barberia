@@ -1,0 +1,241 @@
+/* René Internacional: su propia estética, sacada del local y del sello.
+   Azul noche de las paredes, cobre del sello RI, la guarda griega y los espejos con borde de luz.
+   Todo va bajo [data-negocio='rene'], así no toca a las otras barberías. */
+
+:root[data-negocio='rene'] {
+  --rene-noche: #0d1a3a;
+  --rene-pared: #183a82;
+  --rene-cobre: #d79a6e;
+  --rene-cobre-claro: #f0c7a3;
+  --rene-papel: #f7f1ea;
+  --rene-letra: 'Cormorant Garamond', 'Times New Roman', serif;
+  /* La guarda griega del sello, como franja que se repite */
+  --rene-guarda: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpath d='M0 13H24M0 1H24M4 13V4H16V10H9V7H12' fill='none' stroke='%23d79a6e' stroke-width='1.6'/%3E%3C/svg%3E");
+}
+
+[data-negocio='rene'] .sitio,
+[data-negocio='rene'] .reservar {
+  --negro: var(--rene-noche);
+  --marmol: var(--rene-papel);
+  --fondo: #fffdfa;
+  --linea: #ebe1d6;
+  --tinta: #0f1a35;
+}
+
+/* Títulos en romana clásica, como la columna del sello */
+[data-negocio='rene'] :is(.sitio, .reservar) :is(h1, h2, h3),
+[data-negocio='rene'] .marca span {
+  font-family: var(--rene-letra);
+  font-stretch: normal;
+  letter-spacing: 0;
+}
+[data-negocio='rene'] .marca {
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 700;
+}
+[data-negocio='rene'] .logo-sello {
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px var(--rene-cobre);
+}
+
+/* Portada: el nombre en cursiva grande, la guarda como borde inferior */
+[data-negocio='rene'] .portada {
+  position: relative;
+  background: radial-gradient(120% 70% at 85% 0%, #1a2f63 0%, var(--rene-noche) 60%);
+}
+[data-negocio='rene'] .portada::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 14px;
+  background: var(--rene-guarda) repeat-x;
+  opacity: 0.85;
+}
+[data-negocio='rene'] .portada h1 {
+  font-style: italic;
+  font-weight: 700;
+  font-size: clamp(3.6rem, 2rem + 5.4vw, 6.6rem);
+  line-height: 0.88;
+}
+[data-negocio='rene'] .portada-nota {
+  background: rgb(215 154 110 / 0.16);
+  box-shadow: inset 0 0 0 1px rgb(215 154 110 / 0.45);
+}
+[data-negocio='rene'] .portada-nota span,
+[data-negocio='rene'] .portada-bajada,
+[data-negocio='rene'] .portada-estado {
+  color: #e7dccf;
+}
+[data-negocio='rene'] .portada-fotos img {
+  box-shadow: 0 0 0 2px var(--rene-cobre), 0 0 28px rgb(240 170 110 / 0.35);
+}
+
+/* Títulos de sección grandes, con la guarda abajo */
+[data-negocio='rene'] .bloque h2 {
+  font-size: clamp(3rem, 2.1rem + 3.4vw, 4.8rem);
+  font-weight: 700;
+  line-height: 0.9;
+}
+[data-negocio='rene'] .bloque-cabeza h2::after {
+  content: '';
+  display: block;
+  width: 144px;
+  height: 14px;
+  margin-top: 14px;
+  background: var(--rene-guarda) repeat-x;
+}
+[data-negocio='rene'] .bloque-violeta .bloque-cabeza h2::after {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+[data-negocio='rene'] .local-item h2 {
+  font-size: clamp(2.4rem, 1.8rem + 2vw, 3.4rem);
+  font-weight: 700;
+  line-height: 0.95;
+}
+
+/* Precios: carta de salón sobre el azul noche */
+[data-negocio='rene'] .grupo h3 {
+  border-bottom: 0;
+  padding-bottom: 18px;
+  font-style: italic;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--rene-cobre-claro);
+  background: var(--rene-guarda) repeat-x left bottom;
+}
+[data-negocio='rene'] .servicio-precio {
+  color: var(--rene-cobre-claro);
+}
+[data-negocio='rene'] .servicio-puntos {
+  border-bottom-color: rgb(215 154 110 / 0.4);
+}
+[data-negocio='rene'] .servicio-desc {
+  color: #aeb6cc;
+}
+[data-negocio='rene'] .servicio {
+  border-bottom-color: rgb(215 154 110 / 0.16);
+}
+
+/* Trabajos: cada foto dentro de un espejo del salón, con su borde de luz, sobre la pared azul */
+[data-negocio='rene'] #trabajos {
+  background: var(--rene-pared);
+  color: #fff;
+}
+[data-negocio='rene'] #trabajos .bloque-bajada,
+[data-negocio='rene'] #trabajos .bloque-bajada a {
+  color: #d3dcf3;
+}
+[data-negocio='rene'] .trabajos {
+  gap: 18px;
+}
+[data-negocio='rene'] .trabajos li {
+  overflow: hidden;
+  border-radius: 58% 42% 48% 52% / 36% 44% 18% 20%;
+  background: var(--rene-noche);
+  box-shadow: 0 0 0 2px var(--rene-cobre-claro), 0 0 22px 2px rgb(255 178 104 / 0.5);
+}
+[data-negocio='rene'] .trabajos li:nth-child(3n + 2) {
+  border-radius: 44% 56% 54% 46% / 42% 32% 20% 18%;
+}
+[data-negocio='rene'] .trabajos li:nth-child(3n) {
+  border-radius: 50% 50% 38% 62% / 30% 46% 18% 22%;
+}
+[data-negocio='rene'] .trabajos li::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px rgb(255 214 170 / 0.9), inset 0 0 18px rgb(255 178 104 / 0.55);
+  pointer-events: none;
+}
+[data-negocio='rene'] .trabajos p {
+  z-index: 1;
+  align-items: center;
+  text-align: center;
+  padding-bottom: 18px;
+  background: linear-gradient(transparent, rgb(9 18 42 / 0.85));
+}
+[data-negocio='rene'] .trabajos p strong {
+  font-family: var(--rene-letra);
+  font-style: italic;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+/* Equipo: el bloque de cobre, tarjetas de papel */
+[data-negocio='rene'] .bloque-violeta {
+  background: linear-gradient(160deg, #b8714a 0%, var(--marca) 55%, #8d4c2e 100%);
+}
+[data-negocio='rene'] .barbero {
+  background: var(--rene-papel);
+}
+[data-negocio='rene'] .avatar {
+  background: var(--rene-noche);
+  color: var(--rene-cobre-claro);
+  font-family: var(--rene-letra);
+  font-style: italic;
+  font-size: 30px;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px var(--rene-cobre);
+}
+[data-negocio='rene'] .barbero-nombre {
+  font-family: var(--rene-letra);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Reseñas */
+[data-negocio='rene'] .resena blockquote {
+  font-family: var(--rene-letra);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+[data-negocio='rene'] .resena:nth-child(3n + 1) {
+  background: var(--rene-noche);
+}
+
+/* Sacar turno: los títulos en la misma letra */
+[data-negocio='rene'] .reservar .opciones-grupo h2 {
+  font-style: italic;
+  font-size: 26px;
+  color: var(--marca-tinta);
+}
+[data-negocio='rene'] .reservar .avatar {
+  font-size: 24px;
+}
+
+@media (max-width: 900px) {
+  [data-negocio='rene'] .marca {
+    font-size: 20px;
+  }
+  [data-negocio='rene'] .portada {
+    padding-bottom: 46px;
+  }
+  [data-negocio='rene'] .portada h1 {
+    font-size: clamp(3.4rem, 1.8rem + 7.6vw, 4.6rem);
+  }
+  [data-negocio='rene'] .portada-fotos img {
+    box-shadow: none;
+  }
+  [data-negocio='rene'] .trabajos {
+    gap: 14px;
+  }
+  [data-negocio='rene'] .grupo h3 {
+    font-size: 30px;
+  }
+  [data-negocio='rene'] .barbero-nombre {
+    font-size: 26px;
+  }
+}
+
+/* Panel: el sello redondo */
+[data-negocio='rene'] .admin .logo-sello {
+  border-radius: 50%;
+}

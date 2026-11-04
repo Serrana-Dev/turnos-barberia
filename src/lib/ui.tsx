@@ -3,6 +3,9 @@ import { negocio } from '../config/negocio'
 
 /** El logo del negocio. Ayrton: el corazón invertido con la tijera, como el cartel de neón del local. */
 export function Logo({ tamaño = 36, className = '' }: { tamaño?: number; className?: string }) {
+  if (negocio.id === 'rene')
+    // René: su sello de cobre con la guarda griega, tal cual el de Instagram
+    return <img className={`logo logo-sello ${className}`} src="img/rene/sello.png" width={tamaño} height={tamaño} alt="" />
   if (negocio.id === 'filo')
     // Filo: el cuadrado con el filo de la navaja en diagonal
     return (

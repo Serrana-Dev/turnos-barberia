@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { negocio } from '../config/negocio'
+import { personaDe, negocio } from '../config/negocio'
 import { diaMes, hoyClave, hora, pesos, sumarDias, deClave } from '../lib/formato'
 import { actualizarCliente, useDemo } from '../lib/store'
 import { Dialogo } from '../lib/ui'
@@ -72,7 +72,7 @@ export default function Clientes() {
       <div className="titulo-fila">
         <div>
           <h1>Clientes</h1>
-          <p>Cada reserva suma la ficha sola: visitas, gasto, barbero habitual y notas del corte.</p>
+          <p>Cada reserva suma la ficha sola: visitas, gasto, {personaDe(negocio)[0].toLowerCase()} habitual y notas.</p>
         </div>
       </div>
 
@@ -99,7 +99,7 @@ export default function Clientes() {
         <thead>
           <tr>
             <th>Cliente</th>
-            <th>Barbero habitual</th>
+            <th>{personaDe(negocio)[0]} habitual</th>
             <th className="num">Visitas</th>
             <th className="num">Última visita</th>
             <th className="num">Gastado</th>

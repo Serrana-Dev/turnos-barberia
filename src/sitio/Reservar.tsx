@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { negocio, type SucursalId } from '../config/negocio'
+import { gruposDe, negocio, personaDe, puedeHacer, type SucursalId } from '../config/negocio'
 import { duracion, fechaCorta, fechaLarga, fechaRelativa, hora, hoyClave, pesos, sumarDias, capital } from '../lib/formato'
 import { abierto, crearCliente, crearTurno, huecos, useDemo } from '../lib/store'
 import type { Turno } from '../lib/tipos'
@@ -53,7 +53,7 @@ function CabeceraReserva({ atras }: { atras?: () => void }) {
 }
 
 type Paso = 'suc' | 'servicio' | 'barbero' | 'hora' | 'datos'
-const nombres: Record<Paso, string> = { suc: 'Local', servicio: 'Servicio', barbero: 'Barbero', hora: 'Horario', datos: 'Tus datos' }
+const nombres: Record<Paso, string> = { suc: 'Local', servicio: 'Servicio', barbero: personaDe(negocio)[0], hora: 'Horario', datos: 'Tus datos' }
 const titulos: Record<Paso, string> = {
   suc: '¿A qué local venís?',
   servicio: '¿Qué te hacés?',
@@ -133,8 +133,13 @@ export default function Reservar() {
   }, [paso])
 
   const s = e.servicios.find((x) => x.id === servicio)
+  // Con muchos servicios (barbería, peluquería y uñas) se elige primero el rubro, para no scrollear de más
+  const rubros = gruposDe(negocio).filter(([g]) => e.servicios.some((x) => x.online && x.grupo === g))
+  const conPestanas = rubros.length > 1 && e.servicios.filter((x) => x.online).length > 8
+  const [rubro, setRubro] = useState(() => s?.grupo ?? rubros[0]?.[0])
   const sucursal = negocio.sucursales.find((x) => x.id === suc)
-  const equipo = e.equipo.filter((b) => b.sucursal === suc)
+  // Solo quienes hacen el servicio elegido (en un salón unisex, las uñas no las hace el barbero)
+  const equipo = e.equipo.filter((b) => b.sucursal === suc && puedeHacer(b, s))
   const quien = barbero === 'cualquiera' ? undefined : barbero ?? undefined
 
   const diasAbiertos = useMemo(() => {
@@ -207,8 +212,8 @@ export default function Reservar() {
             </h1>
             <dl className="confirmado-datos">
               <div><dt>Servicio</dt><dd>{sv.nombre}, {pesos(sv.precio)}</dd></div>
-              <div><dt>Barbero</dt><dd>{b.nombre}</dd></div>
-              <div><dt>Dónde</dt><dd>{sc.direccion}, {sc.nombre}</dd></div>
+              <div><dt>{personaDe(negocio)[0]}</dt><dd>{b.nombre}</dd></div>
+              <div><dt>Dónde</dt><dd>{sc.direccion}, {unaSucursal ? sc.ciudad : sc.nombre}</dd></div>
               <div><dt>A nombre de</dt><dd>{nombre}</dd></div>
               <div><dt>Número</dt><dd>{hecho.numero}</dd></div>
             </dl>
@@ -302,14 +307,29 @@ export default function Reservar() {
 
           {actual === 'servicio' && (
             <div className="opciones">
-              {(['Corte', 'Barba', 'Color'] as const).map((g) => {
+              {conPestanas && (
+                <div className="rubros" role="tablist" aria-label="Rubro">
+                  {rubros.map(([g, titulo]) => (
+                    <button key={g} role="tab" aria-selected={rubro === g} className={rubro === g ? 'activo' : ''} onClick={() => setRubro(g)}>
+                      {titulo}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {gruposDe(negocio).map(([g, titulo]) => {
                 const lista = e.servicios.filter((x) => x.online && x.grupo === g)
-                if (!lista.length) return null
+                if (!lista.length || (conPestanas && g !== rubro)) return null
                 return (
                   <div key={g} className="opciones-grupo">
-                    <h2>{g === 'Color' ? 'Color y mechas' : g === 'Corte' ? 'Cortes' : 'Barba'}</h2>
+                    {!conPestanas && <h2>{titulo}</h2>}
                     {lista.map((x) => (
-                      <Opcion key={x.id} elegida={servicio === x.id} onClick={() => { setServicio(x.id); setInicio(null); siguiente() }}>
+                      <Opcion key={x.id} elegida={servicio === x.id} onClick={() => {
+                        setServicio(x.id)
+                        setInicio(null)
+                        const elegido = e.equipo.find((b) => b.id === barbero)
+                        if (elegido && !puedeHacer(elegido, x)) setBarbero(null)
+                        siguiente()
+                      }}>
                         <span className="opcion-texto">
                           <strong>{x.nombre}</strong>
                           <small>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { CalendarDays, List, Plus } from 'lucide-react'
-import { negocio } from '../config/negocio'
+import { personaDe, negocio } from '../config/negocio'
 import { ahoraMin, aMin, capital, deClave, fechaLarga, hora, hoyClave, mesAño, pesos, sumarDias } from '../lib/formato'
 import { franjas, useDemo } from '../lib/store'
 import { estados, type Turno } from '../lib/tipos'
@@ -142,7 +142,7 @@ export default function AgendaMovil({ dia, alcance, ir }: { dia: string; alcance
         })}
       </div>
 
-      <div className="am-barberos" role="tablist" aria-label="Barbero">
+      <div className="am-barberos" role="tablist" aria-label={personaDe(negocio)[0]}>
         <button role="tab" aria-selected={!barbero} className={!barbero ? 'activa' : ''} onClick={() => setQuien('todos')}>
           <span className="am-todos" aria-hidden="true">{equipo.length}</span>
           Todos

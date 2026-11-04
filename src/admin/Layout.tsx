@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { BarChart3, CalendarDays, Clock, Globe, Menu, Plus, RotateCcw, Scissors, Search, Settings, Users, Wallet, UserRound } from 'lucide-react'
-import { negocio } from '../config/negocio'
+import { negocio, puedeHacer } from '../config/negocio'
 import { aMin, ahoraMin, hoyClave } from '../lib/formato'
 import { franjas, reiniciarDemo, useDemo } from '../lib/store'
 import { PRODUCTO } from '../sitio/comun'
@@ -44,16 +44,20 @@ export default function Layout() {
         const fr = franjas(sucursal, dia)
         const ahora = Math.ceil(ahoraMin() / 30) * 30
         const apertura = fr.length ? aMin(fr[0][0]) : 600
+        const barberoId = p?.barberoId ?? e.equipo.find((b) => b.sucursal === sucursal)!.id
+        const quien = e.equipo.find((b) => b.id === barberoId)!
+        // El servicio por defecto es el corte, o lo primero que hace esa persona (uñas, color)
+        const servicioId = p?.servicioId ?? (e.servicios.find((s) => s.id === 'corte' && puedeHacer(quien, s)) ?? e.servicios.find((s) => puedeHacer(quien, s)))?.id ?? 'corte'
         setNuevo({
           sucursal,
           dia,
           inicio: p?.inicio ?? (dia === hoyClave() ? Math.max(ahora, apertura) : apertura),
-          barberoId: p?.barberoId ?? e.equipo.find((b) => b.sucursal === sucursal)!.id,
-          servicioId: p?.servicioId ?? 'corte',
+          barberoId,
+          servicioId,
         })
       },
     }),
-    [alcance, e.equipo],
+    [alcance, e.equipo, e.servicios],
   )
 
   const coincidencias = buscar.length > 1 ? e.clientes.filter((c) => c.nombre.toLowerCase().includes(buscar.toLowerCase())).slice(0, 6) : []

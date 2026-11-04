@@ -3,12 +3,13 @@
 Demo visual de un sistema de turnos para barberías y peluquerías. Es todo frontend: no hay servidor ni base de datos.
 Los datos de prueba se generan solos y se guardan en el navegador de quien la abre.
 
-El mismo código arma dos demos, cada una con sus datos, colores, logo y fotos:
+El mismo código arma tres demos, cada una con sus datos, colores, logo y fotos:
 
 | Demo | Para qué | Datos | Link |
 | --- | --- | --- | --- |
 | **Barbería Filo** | Mostrársela a cualquier barbería | [`src/config/filo.ts`](src/config/filo.ts), inventada | `https://lucasromo.github.io/turnos-barberia/` |
 | **Ayrton Estilistas** | La propuesta para Ayrton | [`src/config/ayrton.ts`](src/config/ayrton.ts), datos reales | `https://lucasromo.github.io/turnos-barberia/ayrton/` |
+| **René Internacional** | La propuesta para René, salón unisex | [`src/config/rene.ts`](src/config/rene.ts), datos reales | `https://serrana-dev.github.io/turnos-barberia/rene/` |
 
 - **Web pública** (`#/`): la ficha de la barbería como en una app de turnos, pensada primero para el celular: fotos,
   próximo turno libre por sucursal, precios, trabajos, equipo con el próximo lugar de cada uno, reseñas,
@@ -47,7 +48,13 @@ Links para mandar:
 3. `npm run dev -- --mode <negocio>` para verlo, y sumar un `vite build --mode <negocio> --outDir dist/<negocio>`
    al script `build` de `package.json` para publicarlo en `/<repo>/<negocio>/`.
 
-`npm run dev` abre Filo; `npm run dev -- --mode ayrton` abre Ayrton.
+`npm run dev` abre Filo; `npm run dev -- --mode ayrton` abre Ayrton; `npm run dev -- --mode rene` abre René.
+
+**Salones que no son solo barbería** (peluquería, uñas, estética): en la config van `grupos` (los rubros de la
+lista de precios), `persona` (cómo se llama a quien atiende, por ejemplo "Profesional") y, en cada persona del
+equipo, `hace` con los rubros que atiende. La reserva solo ofrece a quien hace el servicio elegido, y con más de
+8 servicios la lista se separa en pestañas por rubro. Una estética propia va en un CSS bajo `[data-negocio='<id>']`
+(ver [`src/sitio/rene.css`](src/sitio/rene.css)).
 
 ## La demo de Filo
 
@@ -69,3 +76,15 @@ los productos y su stock, los textos de café y academia, y todos los clientes y
 final conviene pedirles las fotos originales en buena resolución y ponerlas en `public/img/` con los mismos nombres.
 
 **Reseñas**: son extractos cortos de reseñas reales de Google. En la versión con servidor se leen solas de Google.
+
+## La demo de René: qué es real y qué es de muestra
+
+**Real** (de su Instagram @rene.internacional y su ficha de Google): nombre, sello RI, rubros (barbería, peluquería
+y uñas), dirección (Av. San Martín 931, esq. José Muñoz, Villa Carlos Paz), teléfono, horario (lunes a sábado de 9 a
+13 y de 17 a 21), la calificación de Google (4,7 en 27 opiniones), los extractos de reseñas, que atienden con turno
+o por orden de llegada, y todas las fotos. La estética sale del local: el azul de las paredes, el cobre del sello,
+la guarda griega y los espejos con borde de luz.
+
+**De muestra** (confirmar o cambiar): los servicios y precios (los suben en historias destacadas, que no se ven sin
+cuenta), el equipo (René, Lauti, Gonza, Mica y Flor, con lo que hace cada uno), los productos y todos los clientes
+y turnos.

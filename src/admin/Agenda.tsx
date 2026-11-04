@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { negocio, type SucursalId } from '../config/negocio'
+import { personaDe, negocio, type SucursalId } from '../config/negocio'
 import { capital, deClave, diaMes, fechaLarga, hoyClave, mesAño, pesos, sumarDias } from '../lib/formato'
 import { abierto, useDemo } from '../lib/store'
 import { origenes } from '../lib/tipos'
@@ -164,7 +164,7 @@ export default function Agenda() {
           <MiniMes dia={dia} alcance={alcance} elegir={(d) => ir({ dia: d })} />
 
           <section>
-            <h2 className="lado-titulo">Barberos</h2>
+            <h2 className="lado-titulo">{personaDe(negocio)[1]}</h2>
             <ul className="filtro-barberos">
               {equipo.map((b) => {
                 const activo = !ocultos.includes(b.id)
@@ -209,7 +209,7 @@ export default function Agenda() {
 
         <section className="agenda-principal" aria-label="Calendario de turnos">
           {vista === 'dia' && (
-            <div className="uno-por-vez" role="tablist" aria-label="Barbero">
+            <div className="uno-por-vez" role="tablist" aria-label={personaDe(negocio)[0]}>
               {equipo.map((b) => (
                 <button key={b.id} role="tab" aria-selected={elegido?.id === b.id} className={elegido?.id === b.id ? 'activa' : ''} onClick={() => setUno(b.id)}>
                   <Persona b={b} chico />

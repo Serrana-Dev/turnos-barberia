@@ -1,7 +1,7 @@
 // Estado de la demo: vive en el navegador (localStorage) para que lo que
 // se reserva en la web aparezca en el panel. Se regenera cada día.
 import { useSyncExternalStore } from 'react'
-import { negocio, type SucursalId } from '../config/negocio'
+import { negocio, type SucursalId, puedeHacer } from '../config/negocio'
 import { aMin, ahoraMin, deClave, hoyClave, sumarDias } from './formato'
 import { generar, VERSION } from './semilla'
 import type { Cliente, EnEspera, Estado, MetodoPago, Movimiento, Turno } from './tipos'
@@ -138,7 +138,7 @@ export function huecos(e: Estado, sucursal: SucursalId, dia: string, servicioId:
   const servicio = e.servicios.find((s) => s.id === servicioId)
   if (!servicio) return []
   const dow = deClave(dia).getDay()
-  const equipo = e.equipo.filter((b) => b.sucursal === sucursal && b.franco !== dow && (!barberoId || b.id === barberoId))
+  const equipo = e.equipo.filter((b) => b.sucursal === sucursal && b.franco !== dow && (!barberoId || b.id === barberoId) && puedeHacer(b, servicio))
   const ocupados = e.turnos.filter((t) => t.dia === dia && t.sucursal === sucursal && t.estado !== 'cancelado')
   const minimo = dia === hoyClave() ? ahoraMin() + 20 : 0
   const libres: Hueco[] = []

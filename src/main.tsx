@@ -13,6 +13,9 @@ Object.entries({ '--marca': acento, '--marca-hover': hover, '--marca-claro': cla
   document.documentElement.style.setProperty(k, v),
 )
 
+// Para la estética propia de cada negocio en el CSS ([data-negocio="rene"])
+document.documentElement.dataset.negocio = negocio.id
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

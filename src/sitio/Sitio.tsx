@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
-import { negocio, type SucursalId } from '../config/negocio'
+import { gruposDe, negocio, puedeHacer, type SucursalId } from '../config/negocio'
 import { aMin, ahoraMin, capital, duracion, fechaRelativa, hora, hoyClave, pesos, sumarDias } from '../lib/formato'
 import { franjas, huecos, proximoLibre, useDemo } from '../lib/store'
 import { Logo } from '../lib/ui'
@@ -129,6 +129,7 @@ function ProximoLibre() {
     <aside className="libre" aria-labelledby={id} aria-live="polite">
       <div className="libre-arriba">
         <h2 id={id}>Próximo turno libre</h2>
+        {negocio.sucursales.length > 1 && (
         <div className="segmento" role="tablist" aria-label="Sucursal">
           {negocio.sucursales.map((s) => (
             <button key={s.id} role="tab" aria-selected={suc === s.id} className={suc === s.id ? 'activo' : ''} onClick={() => setSuc(s.id)}>
@@ -136,6 +137,7 @@ function ProximoLibre() {
             </button>
           ))}
         </div>
+        )}
       </div>
       {libre && barbero ? (
         <p className="libre-hora">
@@ -168,17 +170,16 @@ const secciones = [
   ['trabajos', 'Trabajos'],
   ['equipo', 'Equipo'],
   ['resenas', 'Reseñas'],
-  ['sucursales', 'Sucursales'],
+  ['sucursales', negocio.sucursales.length > 1 ? 'Sucursales' : 'Dónde estamos'],
 ]
 
 /** La lista de precios como la pizarra del local. */
 function Servicios() {
   const e = useDemo()
-  const grupos = [
-    ['Corte', 'Cortes'],
-    ['Barba', 'Barba'],
-    ['Color', 'Color y mechas'],
-  ] as const
+  const grupos = gruposDe(negocio).filter(([g]) => e.servicios.some((s) => s.grupo === g))
+  // En el celular, con una lista larga, se ve un rubro por vez
+  const conPestanas = grupos.length > 1 && e.servicios.length > 8
+  const [rubro, setRubro] = useState(grupos[0]?.[0])
   return (
     <section id="servicios" className="bloque bloque-negro">
       <div className="ancho">
@@ -186,9 +187,18 @@ function Servicios() {
           <h2>Precios</h2>
           <p className="bloque-bajada">De noviembre. Se paga en el local con efectivo, transferencia, débito o Mercado Pago.</p>
         </div>
+        {conPestanas && (
+          <div className="rubros rubros-pizarra en-movil" role="tablist" aria-label="Rubro">
+            {grupos.map(([g, titulo]) => (
+              <button key={g} role="tab" aria-selected={rubro === g} className={rubro === g ? 'activo' : ''} onClick={() => setRubro(g)}>
+                {titulo}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="pizarra">
           {grupos.map(([g, titulo]) => (
-            <div className="grupo" key={g}>
+            <div className={`grupo ${conPestanas && g !== rubro ? 'oculto-movil' : ''}`} key={g}>
               <h3>{titulo}</h3>
               <ul className="servicios">
                 {e.servicios
@@ -240,7 +250,7 @@ function Trabajos() {
                 <strong>{foto.titulo}</strong>
                 {negocio.inventado ? (
                   <span>@{negocio.instagram}</span>
-                ) : (
+                ) : foto.autor === negocio.instagram ? null : (
                   <a href={`https://instagram.com/${foto.autor}`} target="_blank" rel="noreferrer">
                     @{foto.autor}
                   </a>
@@ -254,11 +264,16 @@ function Trabajos() {
   )
 }
 
-/** El primer hueco para un corte con este barbero en la próxima semana. */
-function libreCon(e: ReturnType<typeof useDemo>, barberoId: string, sucursal: SucursalId) {
+/** El servicio con el que se muestra a cada uno: el corte, o lo primero que hace (uñas, color). */
+function servicioDe(e: ReturnType<typeof useDemo>, b: { hace?: string[] }) {
+  return (e.servicios.find((s) => s.id === 'corte' && puedeHacer(b, s)) ?? e.servicios.find((s) => puedeHacer(b, s)))?.id ?? 'corte'
+}
+
+/** El primer hueco con esta persona en la próxima semana. */
+function libreCon(e: ReturnType<typeof useDemo>, barberoId: string, sucursal: SucursalId, servicio: string) {
   for (let d = 0; d < 8; d++) {
     const dia = sumarDias(hoyClave(), d)
-    const h = huecos(e, sucursal, dia, 'corte', barberoId)
+    const h = huecos(e, sucursal, dia, servicio, barberoId)
     if (h.length) return { dia, inicio: h[0].inicio }
   }
   return null
@@ -271,12 +286,15 @@ function Equipo() {
       <div className="ancho">
         <div className="bloque-cabeza">
           <h2>Equipo</h2>
-          <p className="bloque-bajada">Elegí con quién cortarte. Te mostramos cuándo tiene el próximo lugar cada uno.</p>
+          <p className="bloque-bajada">Elegí con quién. Te mostramos cuándo tiene el próximo lugar cada uno.</p>
         </div>
         <ul className="equipo">
           {e.equipo.map((b) => {
-            const l = libreCon(e, b.id, b.sucursal)
-            const destino = l ? `/reservar?suc=${b.sucursal}&servicio=corte&barbero=${b.id}&dia=${l.dia}&hora=${l.inicio}` : `/reservar?suc=${b.sucursal}&barbero=${b.id}`
+            const sv = servicioDe(e, b)
+            const l = libreCon(e, b.id, b.sucursal, sv)
+            const destino = l
+              ? `/reservar?suc=${b.sucursal}&servicio=${sv}&barbero=${b.id}&dia=${l.dia}&hora=${l.inicio}`
+              : `/reservar?suc=${b.sucursal}&barbero=${b.id}`
             return (
               <li key={b.id}>
                 <Link to={destino} className="barbero">
@@ -285,7 +303,7 @@ function Equipo() {
                   </span>
                   <span className="barbero-nombre">{b.nombre}</span>
                   <span className="barbero-dato">
-                    {negocio.sucursales.find((s) => s.id === b.sucursal)!.nombre}, desde {b.desde}
+                    {b.rol ?? `${negocio.sucursales.find((s) => s.id === b.sucursal)!.nombre}, desde ${b.desde}`}
                   </span>
                   <span className="barbero-libre">{l ? `${capital(fechaRelativa(l.dia))}, ${hora(l.inicio)}` : 'Sin lugar esta semana'}</span>
                 </Link>
@@ -333,7 +351,7 @@ function Resenas() {
           </ul>
           {!todas && (
             <button className="btn btn-secundario resenas-mas" onClick={() => setTodas(true)}>
-              Ver {negocio.reseñas.length - 4} reseñas más
+              {negocio.reseñas.length - 4 === 1 ? 'Ver una reseña más' : `Ver ${negocio.reseñas.length - 4} reseñas más`}
             </button>
           )}
         </div>
@@ -369,7 +387,7 @@ function Sucursales() {
     <section id="sucursales" className="bloque bloque-marmol">
       <div className="ancho">
         <div className="bloque-cabeza">
-          <h2>Sucursales</h2>
+          <h2>{negocio.sucursales.length > 1 ? 'Sucursales' : 'Dónde estamos'}</h2>
         </div>
         <div className="sucursales">
           {negocio.sucursales.map((s, i) => {

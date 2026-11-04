@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { personaDe, negocio } from '../config/negocio'
 import { deClave, diaMes, hoyClave, pct, pesos, sumarDias, num } from '../lib/formato'
 import { useDemo } from '../lib/store'
 import { origenes } from '../lib/tipos'
@@ -107,11 +108,11 @@ export default function Reportes() {
       <div className="grilla-2">
         <section className="tarjeta">
           <div className="tarjeta-cabeza">
-            <h2>Por barbero y comisiones</h2>
+            <h2>Por {personaDe(negocio)[0].toLowerCase()} y comisiones</h2>
           </div>
           <table className="tabla">
             <thead>
-              <tr><th>Barbero</th><th className="num">Turnos</th><th className="num">Facturado</th><th className="num">Comisión</th></tr>
+              <tr><th>{personaDe(negocio)[0]}</th><th className="num">Turnos</th><th className="num">Facturado</th><th className="num">Comisión</th></tr>
             </thead>
             <tbody>
               {r.porBarbero.map((x) => (

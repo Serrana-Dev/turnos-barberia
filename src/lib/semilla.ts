@@ -1,10 +1,10 @@
 // Genera datos de demo creíbles alrededor de la fecha de hoy:
 // 75 días de historia y dos semanas de agenda por delante.
-import { negocio, type Servicio } from '../config/negocio'
+import { negocio, puedeHacer, type Servicio } from '../config/negocio'
 import { aMin, ahoraMin, deClave, hoyClave, sumarDias } from './formato'
 import type { Cliente, Estado, MetodoPago, Movimiento, Origen, Turno, EnEspera } from './tipos'
 
-export const VERSION = 6
+export const VERSION = 7
 
 function azar(semilla: number) {
   let a = semilla >>> 0
@@ -22,8 +22,14 @@ const nombres = [
   'Gonzalo', 'Ignacio', 'Lautaro', 'Valentín', 'Thiago', 'Mateo', 'Julián', 'Ramiro', 'Emiliano', 'Diego',
   'Sebastián', 'Marcos', 'Federico', 'Juan Cruz', 'Benjamín', 'Martín', 'Pablo', 'Ezequiel', 'Rodrigo', 'Lisandro',
   'Bautista', 'Felipe', 'Gastón', 'Hernán', 'Iván', 'Leandro', 'Maximiliano', 'Nahuel', 'Octavio', 'Germán',
-  'Camila', 'Sofía', 'Valentina', 'Martina', 'Lucía',
 ]
+const nombresDe = [
+  'Camila', 'Sofía', 'Valentina', 'Martina', 'Lucía', 'Florencia', 'Agustina', 'Micaela', 'Julieta', 'Carolina',
+  'Paula', 'Romina', 'Daniela', 'Belén', 'Rocío', 'Milagros', 'Antonella', 'Brenda', 'Natalia', 'Lorena',
+]
+// Los servicios de barbería los piden más ellos; el resto (peluquería, uñas), más ellas
+const deBarberia = (s: Servicio) => ['Corte', 'Barba', 'Color', 'Barbería'].includes(s.grupo)
+const pesoPorDefecto: Record<string, number> = { corte: 50, 'corte-barba': 27, barba: 7, 'corte-nino': 9, color: 4, mechas: 3 }
 const apellidos = [
   'González', 'Rodríguez', 'Fernández', 'López', 'Martínez', 'Díaz', 'Pérez', 'Gómez', 'Sánchez', 'Romero',
   'Sosa', 'Álvarez', 'Torres', 'Ruiz', 'Ramírez', 'Flores', 'Acosta', 'Benítez', 'Medina', 'Herrera',
@@ -65,9 +71,11 @@ export function generar(): Estado {
 
   // Clientes
   const clientes: Cliente[] = []
+  const esMujer: boolean[] = []
   const usados = new Set<string>()
   while (clientes.length < 160) {
-    const n = `${elegir(r, nombres)} ${elegir(r, apellidos)}`
+    const mujer = r() < (negocio.servicios.some((s) => !deBarberia(s)) ? 0.45 : 0.1)
+    const n = `${elegir(r, mujer ? nombresDe : nombres)} ${elegir(r, apellidos)}`
     if (usados.has(n)) continue
     usados.add(n)
     clientes.push({
@@ -77,19 +85,21 @@ export function generar(): Estado {
       nota: r() < 0.22 ? elegir(r, notas) : undefined,
       alta: sumarDias(hoy, -Math.floor(r() * 700) - 80),
     })
+    esMujer.push(mujer)
   }
   // Algunos clientes nuevos en el último mes
   for (let i = 0; i < 18; i++) clientes[clientes.length - 1 - i].alta = sumarDias(hoy, -Math.floor(r() * 28))
   // Clientes frecuentes: más chances de volver
   const peso = clientes.map(() => (r() < 0.3 ? 5 : 1))
   const pesoTotal = peso.reduce((a, b) => a + b, 0)
-  const clienteAzar = (dia: string) => {
-    for (let intento = 0; intento < 6; intento++) {
+  const clienteAzar = (dia: string, s?: Servicio) => {
+    const quiere = s && esMujer.some(Boolean) ? !deBarberia(s) : null
+    for (let intento = 0; intento < 10; intento++) {
       let x = r() * pesoTotal
       for (let i = 0; i < clientes.length; i++) {
         x -= peso[i]
         if (x <= 0) {
-          if (clientes[i].alta <= dia) return clientes[i].id
+          if (clientes[i].alta <= dia && (quiere === null || esMujer[i] === quiere || intento > 7)) return clientes[i].id
           break
         }
       }
@@ -101,9 +111,8 @@ export function generar(): Estado {
   const movimientos: Movimiento[] = []
   let numero = 4100
 
-  const mixServicios: [string, number][] = [
-    ['corte', 50], ['corte-barba', 27], ['barba', 7], ['corte-nino', 9], ['color', 4], ['mechas', 3],
-  ]
+  const mixDe = (b: (typeof equipo)[number]): [string, number][] =>
+    servicios.filter((s) => puedeHacer(b, s)).map((s) => [s.id, s.peso ?? pesoPorDefecto[s.id] ?? 5])
   const mixPago: [MetodoPago, number][] = [['efectivo', 34], ['transferencia', 31], ['mercadopago', 25], ['debito', 10]]
   const mixOrigen: [Origen, number][] = [['web', 46], ['whatsapp', 30], ['mostrador', 24]]
 
@@ -111,6 +120,8 @@ export function generar(): Estado {
     const dia = sumarDias(hoy, d)
     const dow = deClave(dia).getDay()
     for (const b of equipo) {
+      const mixServicios = mixDe(b)
+      const masCorto = mixServicios.map(([id]) => porId[id]).sort((x, y) => x.duracion - y.duracion)
       const suc = negocio.sucursales.find((s) => s.id === b.sucursal)!
       const franjas = suc.horario[dow]
       if (!franjas) continue
@@ -127,7 +138,7 @@ export function generar(): Estado {
             continue
           }
           let sid = ponderado(r, mixServicios)
-          if (porId[sid].duracion > fin - t) sid = r() < 0.6 ? 'corte' : 'corte-barba'
+          if (porId[sid].duracion > fin - t) sid = masCorto[r() < 0.6 || masCorto.length < 2 ? 0 : 1].id
           const s = porId[sid]
           if (s.duracion > fin - t) break
           let estado: Turno['estado'] = 'reservado'
@@ -137,7 +148,7 @@ export function generar(): Estado {
           const turno: Turno = {
             id: `t${++numero}`,
             numero,
-            clienteId: clienteAzar(dia),
+            clienteId: clienteAzar(dia, s),
             barberoId: b.id,
             servicioId: sid,
             sucursal: b.sucursal,

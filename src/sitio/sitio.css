@@ -1957,3 +1957,51 @@
     transition: none;
   }
 }
+
+/* Pestañas por rubro (Barbería, Peluquería, Uñas) cuando la lista de servicios es larga */
+.rubros {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rubros button {
+  flex: none;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fondo);
+  box-shadow: inset 0 0 0 1.5px var(--linea);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--tinta);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.rubros button.activo {
+  background: var(--violeta);
+  box-shadow: none;
+  color: #fff;
+}
+.rubros-pizarra {
+  margin-bottom: 20px;
+}
+.rubros-pizarra button {
+  background: rgb(255 255 255 / 0.08);
+  box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.16);
+  color: #fff;
+}
+.rubros-pizarra.en-movil {
+  display: none;
+}
+@media (max-width: 900px) {
+  .rubros-pizarra.en-movil {
+    display: flex;
+  }
+  .pizarra .grupo.oculto-movil {
+    display: none;
+  }
+}
