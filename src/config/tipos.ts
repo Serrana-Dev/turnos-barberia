@@ -27,6 +27,8 @@ export type Servicio = {
   muestra?: boolean
   /** Cuánto se pide, para armar los turnos de la demo (por defecto 5). */
   peso?: number
+  /** Precio distinto según el día (0 = domingo), como "martes a $10.000". El precio de arriba es el más bajo. */
+  precioPorDia?: Record<number, number>
 }
 
 export type Barbero = {
@@ -97,6 +99,8 @@ export type Negocio = {
   fotosGrupo?: Record<string, string>
   /** Cómo se llama a quien atiende: [singular, plural]. Por defecto Barbero, Barberos. */
   persona?: [string, string]
+  /** Rubros que todavía no se pueden reservar ("Uñas, próximamente"). */
+  proximamente?: string[]
   /** Una estética propia: se aplica con [data-negocio] en el CSS. */
   estilo?: boolean
 }
@@ -116,3 +120,28 @@ export const puedeHacer = (b: { hace?: string[] }, s: { grupo: string } | undefi
 export const lunesASabado = (franjas: [string, string][]): Horario => ({
   1: franjas, 2: franjas, 3: franjas, 4: franjas, 5: franjas, 6: franjas,
 })
+
+/** El precio del servicio ese día (fecha "2026-11-04"); sin día, el más bajo. */
+export function precioDe(s: { precio: number; precioPorDia?: Record<number, number> }, dia?: string) {
+  if (!dia || !s.precioPorDia) return s.precio
+  const dow = new Date(`${dia}T12:00:00`).getDay()
+  return s.precioPorDia[dow] ?? s.precio
+}
+
+/** Los tramos de precio por día, cortos: [{ dias: 'Mar', precio }, { dias: 'Mié y Jue', precio }, …]. */
+export function preciosPorDia(s: { precioPorDia?: Record<number, number> }) {
+  const pd = s.precioPorDia
+  if (!pd) return []
+  const cortos = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+  const dias = Object.keys(pd).map(Number).sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7))
+  const tramos: { dias: number[]; precio: number }[] = []
+  for (const d of dias) {
+    const ultimo = tramos[tramos.length - 1]
+    if (ultimo && ultimo.precio === pd[d]) ultimo.dias.push(d)
+    else tramos.push({ dias: [d], precio: pd[d] })
+  }
+  return tramos.map((t) => ({
+    dias: t.dias.length === 1 ? cortos[t.dias[0]] : t.dias.length === 2 ? `${cortos[t.dias[0]]} y ${cortos[t.dias[1]]}` : `${cortos[t.dias[0]]} a ${cortos[t.dias[t.dias.length - 1]]}`,
+    precio: t.precio,
+  }))
+}

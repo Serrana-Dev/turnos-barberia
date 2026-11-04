@@ -80,12 +80,18 @@ final conviene pedirles las fotos originales en buena resolución y ponerlas en 
 
 ## La demo de René: qué es real y qué es de muestra
 
-**Real** (de su Instagram @rene.internacional y su ficha de Google): nombre, sello RI, rubros (barbería, peluquería
-y uñas), dirección (Av. San Martín 931, esq. José Muñoz, Villa Carlos Paz), teléfono, horario (lunes a sábado de 9 a
-13 y de 17 a 21), la calificación de Google (4,7 en 27 opiniones), los extractos de reseñas, que atienden con turno
-o por orden de llegada, y todas las fotos. La estética sale del local: el azul de las paredes, el cobre del sello,
+**Real** (de su Instagram @rene.internacional, su ficha de Google y su catálogo de WhatsApp): nombre, sello RI,
+dirección (Av. San Martín 931, esq. José Muñoz, Villa Carlos Paz), teléfono, horario (lunes a sábado de 9 a 13 y
+de 17 a 21), la calificación de Google (4,7 en 27 opiniones), los extractos de reseñas, que atienden con turno o por
+orden de llegada, los servicios del catálogo (barbería, cabello, color, mechas, tratamientos y uñas como
+"próximamente"), el precio del corte masculino según el día (martes $10.000, miércoles y jueves $12.000, viernes y
+sábado $14.000) y las fotos de sus posteos. La estética sale del local: el azul de las paredes, el cobre del sello,
 la guarda griega y los espejos con borde de luz.
 
-**De muestra** (confirmar o cambiar): los servicios y precios (los suben en historias destacadas, que no se ven sin
-cuenta), el equipo (René en barbería, Mica en peluquería y Flor en uñas), los productos y todos los clientes
-y turnos.
+**De muestra** (confirmar o cambiar): los precios de los demás servicios (el catálogo no los publica), el equipo
+(René en barbería, Mica en peluquería), los productos y todos los clientes y turnos. La foto del rubro Uñas es de
+rawpixel (CC0), porque en sus posteos no hay una.
+
+**Precio según el día**: un servicio puede llevar `precioPorDia` (0 = domingo). La web muestra "desde" y las
+etiquetas por día, la reserva muestra el precio de cada día en la tira de días y el turno se guarda con el precio
+de ese día. Los rubros que todavía no se reservan van en `proximamente`.

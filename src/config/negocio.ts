@@ -9,7 +9,7 @@ import { rene } from './rene'
 import type { Negocio } from './tipos'
 
 export type { Barbero, Foto, Horario, Negocio, Producto, Servicio, Sucursal, SucursalId } from './tipos'
-export { gruposDe, personaDe, puedeHacer } from './tipos'
+export { gruposDe, personaDe, precioDe, preciosPorDia, puedeHacer } from './tipos'
 
 const negocios: Record<string, Negocio> = { filo, ayrton, rene }
 

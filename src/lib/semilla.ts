@@ -1,10 +1,10 @@
 // Genera datos de demo creíbles alrededor de la fecha de hoy:
 // 75 días de historia y dos semanas de agenda por delante.
-import { negocio, puedeHacer, type Servicio } from '../config/negocio'
+import { negocio, precioDe, puedeHacer, type Servicio } from '../config/negocio'
 import { aMin, ahoraMin, deClave, hoyClave, sumarDias } from './formato'
 import type { Cliente, Estado, MetodoPago, Movimiento, Origen, Turno, EnEspera } from './tipos'
 
-export const VERSION = 8
+export const VERSION = 9
 
 function azar(semilla: number) {
   let a = semilla >>> 0
@@ -65,6 +65,7 @@ export function generar(): Estado {
   const ahora = ahoraMin()
   const r = azar(Number(hoy.replace(/-/g, '')))
   const servicios: Servicio[] = negocio.servicios.map((s) => ({ ...s }))
+  const reservables = servicios.filter((s) => s.online)
   const equipo = negocio.equipo.map((b) => ({ ...b }))
   const productos = negocio.productos.map((p) => ({ ...p }))
   const porId = Object.fromEntries(servicios.map((s) => [s.id, s]))
@@ -112,7 +113,7 @@ export function generar(): Estado {
   let numero = 4100
 
   const mixDe = (b: (typeof equipo)[number]): [string, number][] =>
-    servicios.filter((s) => puedeHacer(b, s)).map((s) => [s.id, s.peso ?? pesoPorDefecto[s.id] ?? 5])
+    reservables.filter((s) => puedeHacer(b, s)).map((s) => [s.id, s.peso ?? pesoPorDefecto[s.id] ?? 5])
   const mixPago: [MetodoPago, number][] = [['efectivo', 34], ['transferencia', 31], ['mercadopago', 25], ['debito', 10]]
   const mixOrigen: [Origen, number][] = [['web', 46], ['whatsapp', 30], ['mostrador', 24]]
 
@@ -155,7 +156,7 @@ export function generar(): Estado {
             dia,
             inicio: t,
             duracion: s.duracion,
-            precio: s.precio,
+            precio: precioDe(s, dia),
             estado,
             origen: ponderado(r, mixOrigen),
           }
@@ -198,7 +199,7 @@ export function generar(): Estado {
   if (franjasHoy?.some(([a, b]) => ahora >= aMin(a) && ahora < aMin(b) - 30)) {
     espera.push(
       { id: 'e1', nombre: 'Gonzalo P.', servicioId: 'corte', sucursal: nuevo.id, llegada: ahora - 14 },
-      { id: 'e2', nombre: 'Tobías', servicioId: 'corte-barba', sucursal: nuevo.id, llegada: ahora - 6 },
+      { id: 'e2', nombre: 'Tobías', servicioId: porId['corte-barba'] ? 'corte-barba' : 'corte', sucursal: nuevo.id, llegada: ahora - 6 },
     )
   }
 

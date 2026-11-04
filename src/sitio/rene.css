@@ -325,3 +325,41 @@
 [data-negocio='rene'] .admin .logo-sello {
   border-radius: 50%;
 }
+
+/* El corte según el día: la línea de precios en cobre, como una etiqueta */
+[data-negocio='rene'] .servicio-dias {
+  color: var(--rene-cobre-claro);
+}
+[data-negocio='rene'] .servicio-dias > span {
+  background: rgb(215 154 110 / 0.12);
+  box-shadow: none;
+}
+[data-negocio='rene'] .servicio-dias b {
+  color: #fff;
+}
+[data-negocio='rene'] .servicio-precio small {
+  color: var(--rene-cobre-claro);
+}
+[data-negocio='rene'] .servicio-pronto {
+  opacity: 1;
+  border-style: dashed !important;
+  background: none !important;
+}
+[data-negocio='rene'] .servicio-pronto .servicio-precio {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgb(215 154 110 / 0.16);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+[data-negocio='rene'] .servicio-pronto .servicio-desc {
+  grid-column: 1 / -1;
+}
+[data-negocio='rene'] .grupo-pronto {
+  font-family: var(--rene-letra);
+  font-style: italic;
+  font-size: 21px;
+  line-height: 1.2;
+  color: var(--rene-cobre-claro);
+}

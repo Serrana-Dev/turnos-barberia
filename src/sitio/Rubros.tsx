@@ -28,13 +28,13 @@ export function Rubros({
             aria-selected={elegido}
             className={`rubro ${elegido ? 'activo' : ''}`}
             onClick={() => elegir(r.id)}
-            aria-label={`${r.titulo}: ${r.cuantos} servicios desde ${pesos(r.desde)}`}
+            aria-label={negocio.proximamente?.includes(r.id) ? `${r.titulo}: próximamente` : `${r.titulo}: ${r.cuantos} servicios desde ${pesos(r.desde)}`}
           >
             <span className="rubro-aro" aria-hidden="true">
               {foto ? <img src={foto} alt="" width={160} height={160} /> : <span className="rubro-letra">{r.titulo[0]}</span>}
             </span>
             <span className="rubro-titulo">{r.titulo}</span>
-            <span className="rubro-desde">desde {pesos(r.desde)}</span>
+            <span className="rubro-desde">{negocio.proximamente?.includes(r.id) ? 'Próximamente' : `desde ${pesos(r.desde)}`}</span>
           </button>
         )
       })}
@@ -47,7 +47,7 @@ export function armarRubros(grupos: [string, string][], servicios: { grupo: stri
   return grupos
     .map(([id, titulo]) => {
       const lista = servicios.filter((s) => s.grupo === id)
-      return { id, titulo, cuantos: lista.length, desde: Math.min(...lista.map((s) => s.precio)) }
+      return { id, titulo, cuantos: lista.length, desde: Math.min(...lista.map((s) => s.precio).filter((x) => x > 0), Infinity) }
     })
     .filter((r) => r.cuantos > 0)
 }

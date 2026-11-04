@@ -29,7 +29,7 @@ export const rene: Negocio = {
   instagram: 'rene.internacional',
   dueño: 'René',
   inventado: false,
-  bajada: 'Salón de estética unisex en Villa Carlos Paz: barbería, peluquería y uñas, en San Martín 931.',
+  bajada: 'Salón de estética unisex en Villa Carlos Paz: barbería y peluquería, y muy pronto uñas. En Av. San Martín 931.',
   // El cobre del sello RI; los bloques oscuros van en el azul noche de las paredes del salón
   colores: { acento: '#a8623f', hover: '#924f2f', claro: '#f7ece4', tenue: '#e9c4a6', tinta: '#7a4128' },
   calificacion: { promedio: 4.7, reseñas: 27 },
@@ -55,12 +55,12 @@ export const rene: Negocio = {
       foto: f.viernes,
     },
     {
-      titulo: 'Promos de la semana',
-      texto: 'Las promos cambian seguido y salen primero en el Instagram. Escribinos y te pasamos las de esta semana.',
+      titulo: 'Los martes, corte a $10.000',
+      texto: 'El corte masculino cambia según el día: martes $10.000, miércoles y jueves $12.000, viernes y sábado $14.000.',
       foto: f.lunes,
       acento: true,
-      boton: 'Consultar promos por WhatsApp',
-      whatsapp: 'Hola René! Quiero saber las promos de esta semana',
+      boton: 'Pedir turno para el martes',
+      whatsapp: 'Hola René! Quiero un turno para corte el martes',
     },
   ],
   creditos: {
@@ -89,27 +89,30 @@ export const rene: Negocio = {
     ['Uñas', 'Uñas'],
   ],
   persona: ['Profesional', 'Equipo'],
+  proximamente: ['Uñas'],
   // La foto de cada rubro, como las historias destacadas de su Instagram (la de uñas es de rawpixel, CC0)
   fotosGrupo: { Barbería: 'img/rene/fade.jpg', Peluquería: 'img/rene/asi.jpg', Uñas: 'img/rene/unas.jpg' },
   estilo: true,
 
-  // Los rubros salen de su Instagram (Masculino, Femenino, Uñas); servicios y precios son de muestra.
+  // Del catálogo de WhatsApp de René (noviembre 2026): los servicios, el precio del corte masculino según el día
+  // y uñas como "próximamente". Los demás precios no están publicados: son de muestra.
   servicios: [
-    { id: 'corte', nombre: 'Corte', descripcion: 'Fade, taper o tijera, con lavado y peinado.', grupo: 'Barbería', precio: 15000, duracion: 30, online: true, muestra: true, peso: 40 },
-    { id: 'corte-barba', nombre: 'Corte y barba', descripcion: 'Corte completo y barba perfilada a navaja.', grupo: 'Barbería', precio: 20000, duracion: 45, online: true, muestra: true, peso: 20 },
-    { id: 'barba', nombre: 'Barba', descripcion: 'Perfilado a navaja y toalla caliente.', grupo: 'Barbería', precio: 8000, duracion: 30, online: true, muestra: true, peso: 6 },
-    { id: 'corte-dama', nombre: 'Corte y brushing', descripcion: 'Lavado, corte y secado con brushing.', grupo: 'Peluquería', precio: 22000, duracion: 60, online: true, muestra: true, peso: 10 },
-    { id: 'raiz', nombre: 'Color de raíz', descripcion: 'Retoque de raíz con brushing.', grupo: 'Peluquería', precio: 38000, duracion: 90, online: true, muestra: true, peso: 5 },
-    { id: 'mechas', nombre: 'Mechas o balayage', descripcion: 'Decoloración, matiz y brushing.', grupo: 'Peluquería', precio: 75000, duracion: 180, online: true, muestra: true, peso: 2 },
-    { id: 'semi', nombre: 'Semipermanente', descripcion: 'Esmaltado semipermanente en manos.', grupo: 'Uñas', precio: 14000, duracion: 60, online: true, muestra: true, peso: 8 },
-    { id: 'kapping', nombre: 'Kapping gel', descripcion: 'Refuerzo en gel con color.', grupo: 'Uñas', precio: 19000, duracion: 90, online: true, muestra: true, peso: 4 },
+    { id: 'corte', nombre: 'Corte masculino', descripcion: 'Corte y estilo, con lavado.', grupo: 'Barbería', precio: 10000, precioPorDia: { 2: 10000, 3: 12000, 4: 12000, 5: 14000, 6: 14000 }, duracion: 30, online: true, peso: 40 },
+    { id: 'barba', nombre: 'Arreglo de barba', descripcion: 'Perfilado y prolijado.', grupo: 'Barbería', precio: 7000, duracion: 30, online: true, muestra: true, peso: 8 },
+    { id: 'afeitado', nombre: 'Ritual de afeitado', descripcion: 'Toalla caliente, navaja y bálsamo.', grupo: 'Barbería', precio: 9000, duracion: 30, online: true, muestra: true, peso: 4 },
+    { id: 'corte-dama', nombre: 'Corte de dama', descripcion: 'Asesoramiento, lavado y peinado.', grupo: 'Peluquería', precio: 16000, duracion: 60, online: true, muestra: true, peso: 12 },
+    { id: 'color', nombre: 'Color', descripcion: 'Tinte de raíz o completo, con matiz.', grupo: 'Peluquería', precio: 32000, duracion: 120, online: true, muestra: true, peso: 5 },
+    { id: 'mechas', nombre: 'Mechas', descripcion: 'Balayage, babylights o highlights.', grupo: 'Peluquería', precio: 60000, duracion: 180, online: true, muestra: true, peso: 2 },
+    { id: 'tratamiento', nombre: 'Tratamientos', descripcion: 'Hidratación, keratina, reconstrucción o brillo.', grupo: 'Peluquería', precio: 35000, duracion: 90, online: true, muestra: true, peso: 3 },
+    { id: 'manos', nombre: 'Manicura', descripcion: 'Tradicional o semipermanente.', grupo: 'Uñas', precio: 0, duracion: 60, online: false },
+    { id: 'esculpidas', nombre: 'Esculpidas', descripcion: 'En gel o acrílico, con nail art.', grupo: 'Uñas', precio: 0, duracion: 120, online: false },
+    { id: 'pies', nombre: 'Belleza de pies', descripcion: 'Pedicura completa.', grupo: 'Uñas', precio: 0, duracion: 60, online: false },
   ],
 
-  // Equipo de muestra, uno por rubro: hay que pedirle los nombres reales al local.
+  // Equipo de muestra: René en barbería (de martes a sábado, como los precios del corte) y Mica en peluquería.
   equipo: [
-    { id: 'rene', nombre: 'René', sucursal: 'san-martin', tono: 22, comision: 0, desde: '2009', rol: 'Barbería', hace: ['Barbería'] },
-    { id: 'mica', nombre: 'Mica', sucursal: 'san-martin', tono: 330, comision: 45, desde: '2022', franco: 1, rol: 'Peluquería y color', hace: ['Peluquería'] },
-    { id: 'flor', nombre: 'Flor', sucursal: 'san-martin', tono: 280, comision: 45, desde: '2025', franco: 2, rol: 'Uñas', hace: ['Uñas'] },
+    { id: 'rene', nombre: 'René', sucursal: 'san-martin', tono: 22, comision: 0, desde: '2009', franco: 1, rol: 'Barbería', hace: ['Barbería'] },
+    { id: 'mica', nombre: 'Mica', sucursal: 'san-martin', tono: 330, comision: 45, desde: '2022', rol: 'Peluquería, color y tratamientos', hace: ['Peluquería'] },
   ],
 
   productos: [

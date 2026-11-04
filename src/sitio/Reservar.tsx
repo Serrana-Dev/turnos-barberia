@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { gruposDe, negocio, personaDe, puedeHacer, type SucursalId } from '../config/negocio'
+import { gruposDe, negocio, personaDe, precioDe, puedeHacer, type SucursalId } from '../config/negocio'
 import { duracion, fechaCorta, fechaLarga, fechaRelativa, hora, hoyClave, pesos, sumarDias, capital } from '../lib/formato'
 import { abierto, crearCliente, crearTurno, huecos, useDemo } from '../lib/store'
 import type { Turno } from '../lib/tipos'
@@ -212,7 +212,7 @@ export default function Reservar() {
               {capital(fechaRelativa(hecho.dia) === 'hoy' || fechaRelativa(hecho.dia) === 'mañana' ? fechaRelativa(hecho.dia) : fechaLarga(hecho.dia))} a las {hora(hecho.inicio)}
             </h1>
             <dl className="confirmado-datos">
-              <div><dt>Servicio</dt><dd>{sv.nombre}, {pesos(sv.precio)}</dd></div>
+              <div><dt>Servicio</dt><dd>{sv.nombre}, {pesos(hecho.precio)}</dd></div>
               <div><dt>{personaDe(negocio)[0]}</dt><dd>{b.nombre}</dd></div>
               <div><dt>Dónde</dt><dd>{sc.direccion}, {unaSucursal ? sc.ciudad : sc.nombre}</dd></div>
               <div><dt>A nombre de</dt><dd>{nombre}</dd></div>
@@ -331,7 +331,7 @@ export default function Reservar() {
                             {duracion(x.duracion)}. {x.descripcion}
                           </small>
                         </span>
-                        <span className="opcion-precio">{pesos(x.precio)}</span>
+                        <span className="opcion-precio">{x.precioPorDia && <small>desde </small>}{pesos(x.precio)}</span>
                       </Opcion>
                     ))}
                   </div>
@@ -381,7 +381,9 @@ export default function Reservar() {
                   >
                     <span>{d === hoy ? 'Hoy' : fechaCorta(d).split(' ')[0]}</span>
                     <strong>{Number(d.slice(8))}</strong>
-                    <small>{libresPorDia[d] ? (libresPorDia[d] === 1 ? '1 libre' : `${libresPorDia[d]} libres`) : 'Sin lugar'}</small>
+                    <small className={s?.precioPorDia && libresPorDia[d] ? 'dia-precio' : ''}>
+                      {!libresPorDia[d] ? 'Sin lugar' : s?.precioPorDia ? pesos(precioDe(s, d)) : libresPorDia[d] === 1 ? '1 libre' : `${libresPorDia[d]} libres`}
+                    </small>
                   </button>
                 ))}
               </div>
@@ -426,7 +428,7 @@ export default function Reservar() {
                     {sucursal?.direccion}, {sucursal?.nombre}
                   </p>
                   <p className="datos-ticket-total">
-                    {pesos(s.precio)} <small>se paga en el local</small>
+                    {pesos(precioDe(s, dia ?? diaVisto ?? undefined))} <small>se paga en el local</small>
                   </p>
                 </div>
               )}
@@ -461,7 +463,7 @@ export default function Reservar() {
             {resumen.map((r) => (
               <span key={r}>{r}</span>
             ))}
-            {s && <strong>{pesos(s.precio)}</strong>}
+            {s && <strong>{pesos(precioDe(s, actual === 'hora' || dia ? (dia ?? diaVisto ?? undefined) : undefined))}</strong>}
           </div>
           {actual === 'datos' ? (
             <button className="btn btn-primario btn-ancho" type="submit" form="form-datos" disabled={!nombre.trim() || !tel.trim()}>

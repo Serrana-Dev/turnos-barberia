@@ -1,7 +1,7 @@
 // Estado de la demo: vive en el navegador (localStorage) para que lo que
 // se reserva en la web aparezca en el panel. Se regenera cada día.
 import { useSyncExternalStore } from 'react'
-import { negocio, type SucursalId, puedeHacer } from '../config/negocio'
+import { negocio, precioDe, type SucursalId, puedeHacer } from '../config/negocio'
 import { aMin, ahoraMin, deClave, hoyClave, sumarDias } from './formato'
 import { generar, VERSION } from './semilla'
 import type { Cliente, EnEspera, Estado, MetodoPago, Movimiento, Turno } from './tipos'
@@ -71,7 +71,7 @@ export function actualizarCliente(id: string, cambios: Partial<Cliente>) {
 export function crearTurno(datos: Omit<Turno, 'id' | 'numero' | 'estado' | 'precio' | 'duracion'> & { nota?: string }) {
   const s = estado.servicios.find((x) => x.id === datos.servicioId)!
   const numero = estado.ultimoNumero + 1
-  const turno: Turno = { ...datos, id: `t${numero}`, numero, estado: 'reservado', precio: s.precio, duracion: s.duracion }
+  const turno: Turno = { ...datos, id: `t${numero}`, numero, estado: 'reservado', precio: precioDe(s, datos.dia), duracion: s.duracion }
   guardar({ ...estado, turnos: [...estado.turnos, turno], ultimoNumero: numero })
   return turno
 }

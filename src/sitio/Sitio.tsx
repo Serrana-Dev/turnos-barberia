@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
-import { gruposDe, negocio, puedeHacer, type SucursalId } from '../config/negocio'
+import { gruposDe, negocio, precioDe, preciosPorDia, puedeHacer, type SucursalId } from '../config/negocio'
 import { aMin, ahoraMin, capital, duracion, fechaRelativa, hora, hoyClave, pesos, sumarDias } from '../lib/formato'
 import { franjas, huecos, proximoLibre, useDemo } from '../lib/store'
 import { Logo } from '../lib/ui'
@@ -146,7 +146,7 @@ function ProximoLibre() {
             {capital(fechaRelativa(libre.dia))}, {hora(libre.inicio)}
           </strong>
           <span>
-            Corte con {barbero.nombre}, {pesos(corte.precio)}
+            Corte con {barbero.nombre}, {pesos(precioDe(corte, libre.dia))}
           </span>
         </p>
       ) : (
@@ -224,24 +224,48 @@ function Servicios() {
           {grupos.map(([g, titulo]) => (
             <div className="grupo" key={g}>
               <h3>{titulo}</h3>
+              {negocio.proximamente?.includes(g) && <p className="grupo-pronto">Próximamente en {negocio.nombreCorto}. Escribinos y te avisamos cuando arranque.</p>}
               <ul className="servicios">
                 {e.servicios
                   .filter((s) => s.grupo === g)
-                  .map((s) => (
-                    <li key={s.id}>
-                      <Link to={`/reservar?servicio=${s.id}`} className="servicio" aria-label={`Reservar ${s.nombre}, ${pesos(s.precio)}`}>
+                  .map((s) => {
+                    const pronto = negocio.proximamente?.includes(g)
+                    const contenido = (
+                      <>
                         <span className="servicio-linea">
                           <span className="servicio-nombre">{s.nombre}</span>
                           <span className="servicio-puntos" aria-hidden="true" />
-                          <span className="servicio-precio">{pesos(s.precio)}</span>
+                          <span className="servicio-precio">
+                            {pronto ? 'Pronto' : s.precioPorDia ? <><small>desde </small>{pesos(s.precio)}</> : pesos(s.precio)}
+                          </span>
                         </span>
                         <span className="servicio-desc">
-                          {s.descripcion} <span className="servicio-dur">{duracion(s.duracion)}</span>
+                          {s.descripcion} {!pronto && <span className="servicio-dur">{duracion(s.duracion)}</span>}
+                          {s.precioPorDia && (
+                            <span className="servicio-dias">
+                              {preciosPorDia(s).map((t) => (
+                                <span key={t.dias}>
+                                  {t.dias} <b>{pesos(t.precio)}</b>
+                                </span>
+                              ))}
+                            </span>
+                          )}
                         </span>
-                        <span className="servicio-reservar">Reservar</span>
-                      </Link>
-                    </li>
-                  ))}
+                        {!pronto && <span className="servicio-reservar">Reservar</span>}
+                      </>
+                    )
+                    return (
+                      <li key={s.id}>
+                        {pronto ? (
+                          <div className="servicio servicio-pronto">{contenido}</div>
+                        ) : (
+                          <Link to={`/reservar?servicio=${s.id}`} className="servicio" aria-label={`Reservar ${s.nombre}, ${s.precioPorDia ? 'desde ' : ''}${pesos(s.precio)}`}>
+                            {contenido}
+                          </Link>
+                        )}
+                      </li>
+                    )
+                  })}
               </ul>
             </div>
           ))}
@@ -499,7 +523,7 @@ function Pie() {
 
 /** En el celular, la acción principal queda siempre a mano abajo. */
 function BarraTurno() {
-  const desde = Math.min(...negocio.servicios.map((s) => s.precio))
+  const desde = Math.min(...negocio.servicios.filter((s) => s.online && s.precio > 0).map((s) => s.precio))
   return (
     <div className="barra-turno">
       <p>
