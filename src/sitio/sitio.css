@@ -1862,3 +1862,98 @@
   color: inherit;
   cursor: pointer;
 }
+
+/* ——— Portada en el celular: foto a todo el ancho con el nombre encima, que se vea apenas se abre ——— */
+.portada-sombra,
+.portada-puntos {
+  display: none;
+}
+@media (max-width: 900px) {
+  .portada {
+    display: grid;
+    grid-template-columns: 100%;
+    gap: 0;
+    padding: 0 0 32px;
+  }
+  .portada-fotos {
+    grid-area: 1 / 1;
+    display: flex;
+    gap: 0;
+    height: min(58svh, 520px);
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .portada-fotos img,
+  .portada-fotos img:nth-child(2),
+  .portada-fotos img:nth-child(3) {
+    flex: 0 0 100%;
+    height: 100%;
+    margin: 0;
+    aspect-ratio: auto;
+    border-radius: 0;
+    object-fit: cover;
+    scroll-snap-align: start;
+  }
+  .portada-sombra {
+    grid-area: 1 / 1;
+    display: block;
+    background: linear-gradient(180deg, rgb(0 0 0 / 0.35) 0%, transparent 28%, transparent 45%, rgb(12 12 15 / 0.96) 100%);
+    pointer-events: none;
+  }
+  .portada-puntos {
+    grid-area: 1 / 1;
+    align-self: start;
+    justify-self: center;
+    display: flex;
+    gap: 6px;
+    margin-top: 14px;
+    pointer-events: none;
+  }
+  .portada-puntos i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.5);
+    transition: width 200ms var(--ease), background-color 200ms var(--ease);
+  }
+  .portada-puntos i.activo {
+    width: 20px;
+    border-radius: 4px;
+    background: #fff;
+  }
+  /* El texto se reparte en la grilla: nombre y nota arriba de la foto, el resto abajo */
+  .portada-texto {
+    display: contents;
+  }
+  .portada-nota {
+    justify-self: start;
+    margin: 16px 16px 0;
+  }
+  .portada h1 {
+    grid-area: 1 / 1;
+    align-self: end;
+    z-index: 2;
+    margin: 0 16px 18px;
+    font-size: clamp(2.6rem, 1.6rem + 6vw, 3.4rem);
+    text-shadow: 0 2px 18px rgb(0 0 0 / 0.4);
+    pointer-events: none;
+  }
+  .portada .portada-nota {
+    margin: 18px 16px 0;
+  }
+  .portada .portada-bajada,
+  .portada .portada-estado,
+  .portada .libre {
+    margin: 14px 16px 0;
+    width: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portada-puntos i {
+    transition: none;
+  }
+}

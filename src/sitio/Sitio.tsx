@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
 import { negocio, type SucursalId } from '../config/negocio'
@@ -75,11 +75,24 @@ function Cabecera() {
 /** Arriba de todo: quiénes son, cómo los califican y el próximo turno libre. */
 function Portada() {
   const ahora = estadoAhora(negocio.sucursales[0].id)
+  const fotos = useRef<HTMLDivElement>(null)
+  const [foto, setFoto] = useState(0)
   return (
     <header className="portada">
-      <div className="portada-fotos">
-        {negocio.fotos.portada.map((foto, i) => (
-          <img key={foto.src} src={foto.src} alt={foto.alt} width={foto.ancho} height={foto.alto} fetchPriority={i === 0 ? 'high' : 'auto'} />
+      <div
+        className="portada-fotos"
+        ref={fotos}
+        onScroll={(ev) => setFoto(Math.round(ev.currentTarget.scrollLeft / ev.currentTarget.clientWidth))}
+      >
+        {negocio.fotos.portada.map((f, i) => (
+          <img key={f.src} src={f.src} alt={f.alt} width={f.ancho} height={f.alto} fetchPriority={i === 0 ? 'high' : 'auto'} />
+        ))}
+      </div>
+      {/* En el celular el nombre va arriba de la foto, como en una app; las fotos se deslizan por detrás */}
+      <span className="portada-sombra" aria-hidden="true" />
+      <div className="portada-puntos" aria-hidden="true">
+        {negocio.fotos.portada.map((f, i) => (
+          <i key={f.src} className={i === foto ? 'activo' : ''} />
         ))}
       </div>
       <div className="portada-texto">
