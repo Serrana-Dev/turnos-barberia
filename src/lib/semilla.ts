@@ -4,7 +4,7 @@ import { negocio, puedeHacer, type Servicio } from '../config/negocio'
 import { aMin, ahoraMin, deClave, hoyClave, sumarDias } from './formato'
 import type { Cliente, Estado, MetodoPago, Movimiento, Origen, Turno, EnEspera } from './tipos'
 
-export const VERSION = 7
+export const VERSION = 8
 
 function azar(semilla: number) {
   let a = semilla >>> 0

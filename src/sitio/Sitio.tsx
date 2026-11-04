@@ -6,6 +6,7 @@ import { aMin, ahoraMin, capital, duracion, fechaRelativa, hora, hoyClave, pesos
 import { franjas, huecos, proximoLibre, useDemo } from '../lib/store'
 import { Logo } from '../lib/ui'
 import { BarraDemo, Creditos } from './comun'
+import { armarRubros, Rubros } from './Rubros'
 
 const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
 const whatsapp = (tel: string, texto?: string) =>
@@ -177,9 +178,40 @@ const secciones = [
 function Servicios() {
   const e = useDemo()
   const grupos = gruposDe(negocio).filter(([g]) => e.servicios.some((s) => s.grupo === g))
-  // En el celular, con una lista larga, se ve un rubro por vez
-  const conPestanas = grupos.length > 1 && e.servicios.length > 8
+  // Un salón con rubros (barbería, peluquería, uñas): en el celular se elige el rubro arriba y la lista se desliza
+  const conRubros = !!negocio.grupos && grupos.length > 1
+  const rubros = armarRubros(grupos, e.servicios)
   const [rubro, setRubro] = useState(grupos[0]?.[0])
+  const pizarra = useRef<HTMLDivElement>(null)
+  const indice = Math.max(0, grupos.findIndex(([g]) => g === rubro))
+
+  // El alto de la lista sigue al rubro que se ve, para que no quede un hueco abajo
+  useEffect(() => {
+    const el = pizarra.current
+    if (!el || !conRubros) return
+    const ajustar = () => {
+      const panel = el.children[indice] as HTMLElement | undefined
+      el.style.height = panel && matchMedia('(max-width: 900px)').matches ? `${panel.offsetHeight}px` : ''
+    }
+    ajustar()
+    window.addEventListener('resize', ajustar)
+    return () => window.removeEventListener('resize', ajustar)
+  }, [indice, conRubros, e.servicios])
+
+  const irA = (id: string) => {
+    const el = pizarra.current
+    const i = grupos.findIndex(([g]) => g === id)
+    setRubro(id)
+    const panel = el?.children[i] as HTMLElement | undefined
+    if (el && panel) el.scrollTo({ left: panel.offsetLeft - (el.children[0] as HTMLElement).offsetLeft, behavior: 'smooth' })
+  }
+  const alDeslizar = () => {
+    const el = pizarra.current
+    if (!el) return
+    const i = Math.round(el.scrollLeft / el.clientWidth)
+    if (grupos[i] && grupos[i][0] !== rubro) setRubro(grupos[i][0])
+  }
+
   return (
     <section id="servicios" className="bloque bloque-negro">
       <div className="ancho">
@@ -187,18 +219,10 @@ function Servicios() {
           <h2>Precios</h2>
           <p className="bloque-bajada">De noviembre. Se paga en el local con efectivo, transferencia, débito o Mercado Pago.</p>
         </div>
-        {conPestanas && (
-          <div className="rubros rubros-pizarra en-movil" role="tablist" aria-label="Rubro">
-            {grupos.map(([g, titulo]) => (
-              <button key={g} role="tab" aria-selected={rubro === g} className={rubro === g ? 'activo' : ''} onClick={() => setRubro(g)}>
-                {titulo}
-              </button>
-            ))}
-          </div>
-        )}
-        <div className="pizarra">
+        {conRubros && <Rubros rubros={rubros} activo={rubro} elegir={irA} className="rubros-oscuro en-movil" />}
+        <div className={`pizarra ${conRubros ? 'deslizable' : ''}`} ref={pizarra} onScroll={conRubros ? alDeslizar : undefined}>
           {grupos.map(([g, titulo]) => (
-            <div className={`grupo ${conPestanas && g !== rubro ? 'oculto-movil' : ''}`} key={g}>
+            <div className="grupo" key={g}>
               <h3>{titulo}</h3>
               <ul className="servicios">
                 {e.servicios
@@ -212,7 +236,7 @@ function Servicios() {
                           <span className="servicio-precio">{pesos(s.precio)}</span>
                         </span>
                         <span className="servicio-desc">
-                          {s.descripcion} {duracion(s.duracion)}.
+                          {s.descripcion} <span className="servicio-dur">{duracion(s.duracion)}</span>
                         </span>
                         <span className="servicio-reservar">Reservar</span>
                       </Link>
@@ -222,6 +246,14 @@ function Servicios() {
             </div>
           ))}
         </div>
+        {conRubros && (
+          <p className="rubros-pista en-movil" aria-hidden="true">
+            {grupos.map(([g]) => (
+              <i key={g} className={g === rubro ? 'activo' : ''} />
+            ))}
+            Deslizá para ver {grupos.filter(([g]) => g !== rubro).map(([, t]) => t.toLowerCase()).join(' y ')}
+          </p>
+        )}
       </div>
     </section>
   )

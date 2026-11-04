@@ -1958,50 +1958,199 @@
   }
 }
 
-/* Pestañas por rubro (Barbería, Peluquería, Uñas) cuando la lista de servicios es larga */
-.rubros {
+/* Rubros (Barbería, Peluquería, Uñas) como historias destacadas: foto redonda, el elegido con el aro de color */
+.rubros-historias {
   display: flex;
-  gap: 6px;
-  margin-bottom: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  justify-content: center;
+  gap: 16px;
+  margin: 0 0 24px;
 }
-.rubros button {
-  flex: none;
-  min-height: 44px;
-  padding: 0 18px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--fondo);
-  box-shadow: inset 0 0 0 1.5px var(--linea);
-  font: inherit;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--tinta);
-  cursor: pointer;
-  touch-action: manipulation;
-}
-.rubros button.activo {
-  background: var(--violeta);
-  box-shadow: none;
-  color: #fff;
-}
-.rubros-pizarra {
-  margin-bottom: 20px;
-}
-.rubros-pizarra button {
-  background: rgb(255 255 255 / 0.08);
-  box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.16);
-  color: #fff;
-}
-.rubros-pizarra.en-movil {
+.rubros-historias.en-movil {
   display: none;
 }
+.rubro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 88px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.rubro-aro {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 78px;
+  height: 78px;
+  margin-bottom: 4px;
+  padding: 3px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.2);
+  transition: transform 260ms var(--ease);
+}
+.rubro-aro::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 200deg, var(--marca-tenue), var(--marca), #fff, var(--marca-tenue));
+  opacity: 0;
+  transition: opacity 260ms var(--ease);
+}
+.rubro-aro img,
+.rubro-letra {
+  position: absolute;
+  inset: 3px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  max-width: none;
+  aspect-ratio: 1;
+  border: 3px solid var(--negro);
+  border-radius: 50%;
+  object-fit: cover;
+  transition: filter 260ms var(--ease);
+}
+.rubro-letra {
+  display: grid;
+  place-items: center;
+  background: var(--marca);
+  font-size: 28px;
+  font-weight: 800;
+}
+.rubro:not(.activo) .rubro-aro img {
+  filter: saturate(0.5) brightness(0.75);
+}
+.rubro.activo .rubro-aro {
+  transform: scale(1.08);
+}
+.rubro.activo .rubro-aro::before {
+  opacity: 1;
+  animation: rubro-aro 900ms var(--ease);
+}
+@keyframes rubro-aro {
+  from {
+    transform: rotate(-160deg);
+  }
+}
+.rubro:active .rubro-aro {
+  transform: scale(0.96);
+}
+.rubro-titulo {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.rubro-desde {
+  font-size: 12px;
+  opacity: 0.7;
+}
+.rubro:not(.activo) .rubro-titulo {
+  opacity: 0.75;
+}
+/* Sobre fondo claro (al sacar turno) */
+.rubros-claro .rubro-aro {
+  background: var(--linea);
+}
+.rubros-claro .rubro-aro img,
+.rubros-claro .rubro-letra {
+  border-color: var(--fondo);
+}
+.rubros-claro .rubro:not(.activo) .rubro-aro img {
+  filter: saturate(0.6) opacity(0.8);
+}
+
+/* La pista de que la lista se desliza */
+.rubros-pista {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px !important;
+  font-size: 13px;
+  opacity: 0.7;
+}
+.rubros-pista i {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: currentColor;
+  opacity: 0.5;
+  transition: width 260ms var(--ease), opacity 260ms var(--ease);
+}
+.rubros-pista i.activo {
+  width: 18px;
+  opacity: 1;
+}
+.rubros-pista i:last-of-type {
+  margin-right: 6px;
+}
+
+/* Al cambiar de rubro en la reserva, la lista entra de costado */
+.opciones-rubro > * {
+  animation: rubro-entra 320ms var(--ease) backwards;
+}
+.opciones-rubro > :nth-child(2) {
+  animation-delay: 40ms;
+}
+.opciones-rubro > :nth-child(3) {
+  animation-delay: 80ms;
+}
+.opciones-rubro > :nth-child(4) {
+  animation-delay: 120ms;
+}
+@keyframes rubro-entra {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+
 @media (max-width: 900px) {
-  .rubros-pizarra.en-movil {
+  .rubros-historias.en-movil {
     display: flex;
   }
-  .pizarra .grupo.oculto-movil {
+  .rubros-pista {
+    display: flex;
+  }
+  /* Precios: un rubro por pantalla, se desliza con el dedo */
+  .pizarra.deslizable {
+    display: flex;
+    gap: 0;
+    margin: 0 -16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    align-items: flex-start;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    transition: height 320ms var(--ease);
+  }
+  .pizarra.deslizable::-webkit-scrollbar {
     display: none;
+  }
+  .pizarra.deslizable .grupo {
+    flex: 0 0 100%;
+    padding: 0 16px;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  .pizarra.deslizable .grupo h3 {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rubro-aro,
+  .rubro-aro::before,
+  .opciones-rubro > *,
+  .pizarra.deslizable {
+    animation: none !important;
+    transition: none !important;
   }
 }

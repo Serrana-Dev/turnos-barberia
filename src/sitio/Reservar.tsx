@@ -7,6 +7,7 @@ import type { Turno } from '../lib/tipos'
 import { CalendarPlus, Check, CheckCheck, ChevronLeft, ChevronRight, MapPin } from 'lucide-react'
 import { Logo } from '../lib/ui'
 import { BarraDemo } from './comun'
+import { armarRubros, Rubros } from './Rubros'
 
 /** El turno como evento de calendario (.ics), para agendarlo en el celular con un toque. */
 function enlaceCalendario(t: Turno, titulo: string, lugar: string) {
@@ -135,7 +136,7 @@ export default function Reservar() {
   const s = e.servicios.find((x) => x.id === servicio)
   // Con muchos servicios (barbería, peluquería y uñas) se elige primero el rubro, para no scrollear de más
   const rubros = gruposDe(negocio).filter(([g]) => e.servicios.some((x) => x.online && x.grupo === g))
-  const conPestanas = rubros.length > 1 && e.servicios.filter((x) => x.online).length > 8
+  const conPestanas = !!negocio.grupos && rubros.length > 1
   const [rubro, setRubro] = useState(() => s?.grupo ?? rubros[0]?.[0])
   const sucursal = negocio.sucursales.find((x) => x.id === suc)
   // Solo quienes hacen el servicio elegido (en un salón unisex, las uñas no las hace el barbero)
@@ -308,19 +309,13 @@ export default function Reservar() {
           {actual === 'servicio' && (
             <div className="opciones">
               {conPestanas && (
-                <div className="rubros" role="tablist" aria-label="Rubro">
-                  {rubros.map(([g, titulo]) => (
-                    <button key={g} role="tab" aria-selected={rubro === g} className={rubro === g ? 'activo' : ''} onClick={() => setRubro(g)}>
-                      {titulo}
-                    </button>
-                  ))}
-                </div>
+                <Rubros rubros={armarRubros(rubros, e.servicios.filter((x) => x.online))} activo={rubro} elegir={setRubro} className="rubros-claro" />
               )}
               {gruposDe(negocio).map(([g, titulo]) => {
                 const lista = e.servicios.filter((x) => x.online && x.grupo === g)
                 if (!lista.length || (conPestanas && g !== rubro)) return null
                 return (
-                  <div key={g} className="opciones-grupo">
+                  <div key={g} className={`opciones-grupo ${conPestanas ? 'opciones-rubro' : ''}`}>
                     {!conPestanas && <h2>{titulo}</h2>}
                     {lista.map((x) => (
                       <Opcion key={x.id} elegida={servicio === x.id} onClick={() => {

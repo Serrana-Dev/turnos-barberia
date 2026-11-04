@@ -93,6 +93,8 @@ export type Negocio = {
   productos: Producto[]
   /** Los grupos de la lista de precios, en orden: [grupo, título]. */
   grupos?: [string, string][]
+  /** La foto de cada rubro para elegirlo (como las historias destacadas): { Uñas: 'img/…' }. */
+  fotosGrupo?: Record<string, string>
   /** Cómo se llama a quien atiende: [singular, plural]. Por defecto Barbero, Barberos. */
   persona?: [string, string]
   /** Una estética propia: se aplica con [data-negocio] en el CSS. */

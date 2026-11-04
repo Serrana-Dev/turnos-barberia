@@ -41,7 +41,6 @@ export const rene: Negocio = {
     { nombre: 'Rodrigo G.', cuando: 'hace 3 semanas', texto: 'Muy buena atención y se nota que saben muchísimo.' },
     { nombre: 'Darío B.', cuando: 'hace 11 meses', texto: 'Excelente peluquería. Muy buen corte me hicieron. Esta gente sabe.' },
     { nombre: 'Cliente en Google', cuando: 'reseña destacada', texto: 'Muy buena atención personalizada.' },
-    { nombre: 'Cliente en Google', cuando: 'reseña destacada', texto: 'Deliciosas personas.' },
   ],
 
   // Fotos de su Instagram
@@ -66,7 +65,10 @@ export const rene: Negocio = {
   ],
   creditos: {
     texto: 'Fotos de Instagram',
-    enlaces: [{ texto: '@rene.internacional', url: 'https://instagram.com/rene.internacional' }],
+    enlaces: [
+      { texto: '@rene.internacional', url: 'https://instagram.com/rene.internacional' },
+      { texto: 'uñas: rawpixel (CC0)', url: 'https://www.rawpixel.com/image/3299322/free-photo-image-nail-polish-manicure' },
+    ],
   },
 
   sucursales: [
@@ -87,36 +89,31 @@ export const rene: Negocio = {
     ['Uñas', 'Uñas'],
   ],
   persona: ['Profesional', 'Equipo'],
+  // La foto de cada rubro, como las historias destacadas de su Instagram (la de uñas es de rawpixel, CC0)
+  fotosGrupo: { Barbería: 'img/rene/fade.jpg', Peluquería: 'img/rene/asi.jpg', Uñas: 'img/rene/unas.jpg' },
   estilo: true,
 
-  // Los rubros salen de su Instagram (Masculino, Femenino, Uñas); los precios son de muestra.
+  // Los rubros salen de su Instagram (Masculino, Femenino, Uñas); servicios y precios son de muestra.
   servicios: [
     { id: 'corte', nombre: 'Corte', descripcion: 'Fade, taper o tijera, con lavado y peinado.', grupo: 'Barbería', precio: 15000, duracion: 30, online: true, muestra: true, peso: 40 },
-    { id: 'corte-barba', nombre: 'Corte y barba', descripcion: 'Corte completo y barba perfilada a navaja.', grupo: 'Barbería', precio: 20000, duracion: 45, online: true, muestra: true, peso: 18 },
-    { id: 'barba', nombre: 'Barba', descripcion: 'Perfilado a navaja y toalla caliente.', grupo: 'Barbería', precio: 8000, duracion: 20, online: true, muestra: true, peso: 5 },
-    { id: 'corte-nino', nombre: 'Corte niños', descripcion: 'Hasta 12 años.', grupo: 'Barbería', precio: 12000, duracion: 30, online: true, muestra: true, peso: 6 },
-    { id: 'corte-dama', nombre: 'Corte y brushing', descripcion: 'Lavado, corte y secado con brushing.', grupo: 'Peluquería', precio: 22000, duracion: 60, online: true, muestra: true, peso: 8 },
-    { id: 'brushing', nombre: 'Brushing', descripcion: 'Lavado y secado con forma.', grupo: 'Peluquería', precio: 13000, duracion: 30, online: true, muestra: true, peso: 4 },
-    { id: 'raiz', nombre: 'Color de raíz', descripcion: 'Retoque de raíz con brushing.', grupo: 'Peluquería', precio: 38000, duracion: 90, online: true, muestra: true, peso: 4 },
-    { id: 'mechas', nombre: 'Mechas o balayage', descripcion: 'Decoloración, matiz y brushing. Se reserva la tarde.', grupo: 'Peluquería', precio: 75000, duracion: 180, online: true, muestra: true, peso: 2 },
-    { id: 'alisado', nombre: 'Alisado', descripcion: 'Alisado sin formol, con corte de puntas.', grupo: 'Peluquería', precio: 60000, duracion: 150, online: true, muestra: true, peso: 2 },
+    { id: 'corte-barba', nombre: 'Corte y barba', descripcion: 'Corte completo y barba perfilada a navaja.', grupo: 'Barbería', precio: 20000, duracion: 45, online: true, muestra: true, peso: 20 },
+    { id: 'barba', nombre: 'Barba', descripcion: 'Perfilado a navaja y toalla caliente.', grupo: 'Barbería', precio: 8000, duracion: 30, online: true, muestra: true, peso: 6 },
+    { id: 'corte-dama', nombre: 'Corte y brushing', descripcion: 'Lavado, corte y secado con brushing.', grupo: 'Peluquería', precio: 22000, duracion: 60, online: true, muestra: true, peso: 10 },
+    { id: 'raiz', nombre: 'Color de raíz', descripcion: 'Retoque de raíz con brushing.', grupo: 'Peluquería', precio: 38000, duracion: 90, online: true, muestra: true, peso: 5 },
+    { id: 'mechas', nombre: 'Mechas o balayage', descripcion: 'Decoloración, matiz y brushing.', grupo: 'Peluquería', precio: 75000, duracion: 180, online: true, muestra: true, peso: 2 },
     { id: 'semi', nombre: 'Semipermanente', descripcion: 'Esmaltado semipermanente en manos.', grupo: 'Uñas', precio: 14000, duracion: 60, online: true, muestra: true, peso: 8 },
-    { id: 'kapping', nombre: 'Kapping gel', descripcion: 'Refuerzo en gel sobre la uña natural, con color.', grupo: 'Uñas', precio: 19000, duracion: 90, online: true, muestra: true, peso: 4 },
-    { id: 'esculpidas', nombre: 'Uñas esculpidas', descripcion: 'Extensión en acrílico o gel, con diseño.', grupo: 'Uñas', precio: 28000, duracion: 120, online: true, muestra: true, peso: 2 },
+    { id: 'kapping', nombre: 'Kapping gel', descripcion: 'Refuerzo en gel con color.', grupo: 'Uñas', precio: 19000, duracion: 90, online: true, muestra: true, peso: 4 },
   ],
 
-  // Equipo de muestra: hay que pedirle los nombres reales al local.
+  // Equipo de muestra, uno por rubro: hay que pedirle los nombres reales al local.
   equipo: [
-    { id: 'rene', nombre: 'René', sucursal: 'san-martin', tono: 22, comision: 0, desde: '2009', rol: 'Barbería y peluquería', hace: ['Barbería', 'Peluquería'] },
-    { id: 'lauti', nombre: 'Lauti', sucursal: 'san-martin', tono: 210, comision: 50, desde: '2023', franco: 1, rol: 'Barbería', hace: ['Barbería'] },
-    { id: 'gonza', nombre: 'Gonza', sucursal: 'san-martin', tono: 150, comision: 50, desde: '2024', franco: 3, rol: 'Barbería', hace: ['Barbería'] },
-    { id: 'mica', nombre: 'Mica', sucursal: 'san-martin', tono: 330, comision: 45, desde: '2022', franco: 2, rol: 'Color y peluquería', hace: ['Peluquería'] },
-    { id: 'flor', nombre: 'Flor', sucursal: 'san-martin', tono: 280, comision: 45, desde: '2025', franco: 4, rol: 'Uñas', hace: ['Uñas'] },
+    { id: 'rene', nombre: 'René', sucursal: 'san-martin', tono: 22, comision: 0, desde: '2009', rol: 'Barbería', hace: ['Barbería'] },
+    { id: 'mica', nombre: 'Mica', sucursal: 'san-martin', tono: 330, comision: 45, desde: '2022', franco: 1, rol: 'Peluquería y color', hace: ['Peluquería'] },
+    { id: 'flor', nombre: 'Flor', sucursal: 'san-martin', tono: 280, comision: 45, desde: '2025', franco: 2, rol: 'Uñas', hace: ['Uñas'] },
   ],
 
   productos: [
     { id: 'pomada', nombre: 'Pomada mate', precio: 11000, stock: 12, muestra: true },
-    { id: 'polvo', nombre: 'Polvo texturizador', precio: 9500, stock: 7, muestra: true },
     { id: 'shampoo', nombre: 'Shampoo matizador', precio: 14000, stock: 5, muestra: true },
     { id: 'aceite', nombre: 'Aceite de cutículas', precio: 6000, stock: 3, muestra: true },
   ],

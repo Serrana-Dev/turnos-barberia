@@ -53,7 +53,8 @@ Links para mandar:
 **Salones que no son solo barbería** (peluquería, uñas, estética): en la config van `grupos` (los rubros de la
 lista de precios), `persona` (cómo se llama a quien atiende, por ejemplo "Profesional") y, en cada persona del
 equipo, `hace` con los rubros que atiende. La reserva solo ofrece a quien hace el servicio elegido, y con más de
-8 servicios la lista se separa en pestañas por rubro. Una estética propia va en un CSS bajo `[data-negocio='<id>']`
+rubros se eligen como historias destacadas de Instagram: un círculo con foto por rubro (`fotosGrupo`), y en el celular
+la lista de precios se desliza de rubro en rubro. Una estética propia va en un CSS bajo `[data-negocio='<id>']`
 (ver [`src/sitio/rene.css`](src/sitio/rene.css)).
 
 ## La demo de Filo
@@ -86,5 +87,5 @@ o por orden de llegada, y todas las fotos. La estética sale del local: el azul 
 la guarda griega y los espejos con borde de luz.
 
 **De muestra** (confirmar o cambiar): los servicios y precios (los suben en historias destacadas, que no se ven sin
-cuenta), el equipo (René, Lauti, Gonza, Mica y Flor, con lo que hace cada uno), los productos y todos los clientes
+cuenta), el equipo (René en barbería, Mica en peluquería y Flor en uñas), los productos y todos los clientes
 y turnos.
