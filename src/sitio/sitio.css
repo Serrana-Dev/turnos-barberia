@@ -1434,3 +1434,431 @@
     margin-top: 0;
   }
 }
+
+/* ——— Sacar turno: un paso por pantalla, con la línea de pasos arriba y lo elegido abajo ——— */
+.reservar-pasos {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--marmol);
+}
+.reservar-pasos .reservar-cuerpo {
+  flex: 1;
+  width: 100%;
+  padding-top: 20px;
+  padding-bottom: 24px;
+}
+.pasos-cabeza {
+  position: sticky;
+  top: var(--cabecera);
+  z-index: 15;
+  padding: 14px 12px 10px;
+  background: var(--fondo);
+  box-shadow: 0 6px 16px rgb(0 0 0 / 0.05);
+}
+.linea-pasos {
+  display: flex;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+.linea-paso {
+  position: relative;
+  flex: 1;
+}
+/* El tramo de línea que une cada paso con el anterior */
+.linea-paso + .linea-paso::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  right: 50%;
+  left: -50%;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--linea);
+  transition: background-color 300ms var(--ease);
+}
+.linea-paso.hecho + .linea-paso::before {
+  background: var(--violeta);
+}
+.linea-paso button {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--gris);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.linea-paso button:disabled {
+  cursor: default;
+}
+.linea-circulo {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--fondo);
+  box-shadow: inset 0 0 0 2px var(--linea);
+  font-size: 14px;
+  font-weight: 800;
+  transition: background-color 250ms var(--ease), box-shadow 250ms var(--ease), transform 250ms var(--ease);
+}
+.linea-nombre {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.linea-paso.hecho .linea-circulo {
+  background: var(--violeta);
+  box-shadow: none;
+  color: #fff;
+}
+.linea-paso.hecho .linea-nombre {
+  color: var(--tinta);
+}
+.linea-paso.actual .linea-circulo {
+  background: var(--tinta);
+  box-shadow: 0 0 0 4px var(--violeta-claro);
+  color: #fff;
+  transform: scale(1.08);
+}
+.linea-paso.actual .linea-nombre {
+  color: var(--tinta);
+  font-weight: 800;
+}
+
+.paso-pantalla {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  outline: none;
+  animation: paso-entra 260ms var(--ease) both;
+}
+.paso-pantalla:focus,
+.paso-pantalla:focus-visible {
+  outline: none;
+}
+.paso-pantalla.desde-izquierda {
+  animation-name: paso-vuelve;
+}
+@keyframes paso-entra {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+@keyframes paso-vuelve {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+.paso-de {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--violeta);
+}
+.paso-pantalla h1 {
+  margin-top: -10px;
+  font-size: 32px;
+  font-weight: 800;
+  font-stretch: 112%;
+  letter-spacing: -0.03em;
+}
+.reservar-pasos .opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.opciones-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.opciones-grupo + .opciones-grupo {
+  margin-top: 10px;
+}
+.opciones-grupo h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gris);
+}
+.reservar-pasos .opcion {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 72px;
+  padding: 14px 14px 14px 16px;
+  border: 2px solid transparent;
+  border-radius: 18px;
+  background: var(--fondo);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  text-align: left;
+  touch-action: manipulation;
+  transition: border-color 150ms var(--ease), background-color 150ms var(--ease), transform 150ms var(--ease);
+}
+.reservar-pasos .opcion:active {
+  transform: scale(0.98);
+}
+@media (hover: hover) and (pointer: fine) {
+  .reservar-pasos .opcion:hover {
+    border-color: var(--violeta);
+    background: var(--fondo);
+  }
+}
+.reservar-pasos .opcion.elegida {
+  border-color: var(--violeta);
+  background: var(--violeta-claro);
+}
+.reservar-pasos .opcion-destacada,
+.reservar-pasos .opcion-destacada:hover {
+  background: var(--tinta);
+  color: #fff;
+}
+.opcion-destacada .opcion-texto small {
+  color: var(--marca-tenue);
+}
+.opcion-destacada .opcion-flecha {
+  color: #fff;
+}
+.opcion-icono {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 14px;
+  background: var(--violeta-claro);
+  color: var(--violeta);
+}
+.opcion-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.opcion-texto strong {
+  font-size: 17px;
+}
+.opcion-texto small {
+  font-size: 14px;
+  color: var(--gris);
+  line-height: 1.35;
+}
+.reservar-pasos .opcion-precio {
+  flex: none;
+  font-size: 17px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.opcion-flecha {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--gris);
+}
+.opcion.elegida .opcion-flecha {
+  background: var(--violeta);
+  color: #fff;
+}
+.reservar-pasos .avatar {
+  background: hsl(var(--tono) 58% 40%);
+  color: #fff;
+  width: 46px;
+  height: 46px;
+  margin: 0;
+  flex: none;
+  font-size: 19px;
+}
+.reservar-pasos .avatar-todos {
+  background: var(--violeta);
+  color: #fff;
+}
+
+.reservar-pasos .dias {
+  margin: 0 -16px;
+  padding: 2px 16px 6px;
+  gap: 8px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+.reservar-pasos .dias::-webkit-scrollbar {
+  display: none;
+}
+.reservar-pasos .dia {
+  width: 68px;
+  padding: 12px 0 10px;
+  border: 0;
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  scroll-snap-align: start;
+  touch-action: manipulation;
+}
+.reservar-pasos .dia strong {
+  font-size: 22px;
+}
+.reservar-pasos .dia.activa {
+  background: var(--tinta);
+  color: #fff;
+}
+.reservar-pasos .dia.activa span,
+.reservar-pasos .dia.activa small {
+  color: var(--marca-tenue);
+}
+.dia-elegido {
+  margin: 0;
+  font-weight: 700;
+  font-size: 17px;
+}
+.sin-lugar {
+  margin: 0;
+  padding: 18px;
+  border-radius: 16px;
+  background: var(--fondo);
+  color: var(--gris);
+}
+.franja {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.franja h2 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gris);
+}
+.reservar-pasos .horas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 0;
+}
+.reservar-pasos .hora {
+  min-height: 50px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--fondo);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  font-size: 16px;
+  touch-action: manipulation;
+  transition: background-color 150ms var(--ease), transform 150ms var(--ease);
+}
+.reservar-pasos .hora:active {
+  transform: scale(0.95);
+}
+.reservar-pasos .hora.activa {
+  background: var(--violeta);
+  color: #fff;
+}
+
+.datos-ticket {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 20px;
+  border-radius: 20px;
+  background: var(--tinta);
+  color: #d6d6dd;
+}
+.datos-ticket-cuando {
+  margin-bottom: 6px !important;
+  font-size: 26px;
+  font-weight: 800;
+  font-stretch: 108%;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.datos-ticket-total {
+  margin-top: 12px !important;
+  padding-top: 12px;
+  border-top: 2px dashed rgb(255 255 255 / 0.18);
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+}
+.datos-ticket-total small {
+  font-size: 14px;
+  font-weight: 500;
+  color: #b9b9c2;
+}
+.reservar-pasos .datos {
+  gap: 16px;
+}
+.reservar-pasos .datos input {
+  height: 54px;
+  border-radius: 14px;
+  font-size: 17px;
+}
+
+.pasos-pie {
+  position: sticky;
+  bottom: 0;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--fondo);
+  box-shadow: 0 -6px 18px rgb(0 0 0 / 0.07);
+}
+.pasos-elegido {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.pasos-elegido span {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--marmol);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pasos-elegido strong {
+  margin-left: auto;
+  padding-left: 8px;
+  flex: none;
+  font-size: 17px;
+}
+.pasos-pie .btn {
+  max-width: 560px;
+  margin: 0 auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .paso-pantalla,
+  .linea-circulo,
+  .reservar-pasos .opcion,
+  .reservar-pasos .hora {
+    animation: none;
+    transition: none;
+  }
+}
+
+.reservar button.volver {
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
