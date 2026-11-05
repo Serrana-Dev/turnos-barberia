@@ -10,7 +10,10 @@ import { enAlcance, nombreAlcance, Persona, useAdmin, useIndices } from './comun
 export default function Hoy() {
   const e = useDemo()
   const ix = useIndices(e)
-  const { alcance, verTurno, nuevoTurno } = useAdmin()
+  const { alcance, verTurno, nuevoTurno, rol, quien } = useAdmin()
+  // Un empleado ve su día sin plata: ni lo cobrado, ni la caja, ni lo que factura el local
+  const esDueño = rol === 'dueño'
+  const yo = e.equipo.find((b) => b.id === quien)
   const hoy = hoyClave()
   const ahora = ahoraMin()
   const semanaPasada = sumarDias(hoy, -7)
@@ -36,7 +39,10 @@ export default function Hoy() {
         return m + franjas(s.id, hoy).reduce((x, [a, b]) => x + aMin(b) - aMin(a), 0) * sillones
       }, 0)
     const ocupado = deHoy.reduce((s, t) => s + t.duracion, 0)
-    const proximos = deHoy.filter((t) => t.estado === 'reservado' && t.inicio + t.duracion > ahora).sort((a, b) => a.inicio - b.inicio)
+    const proximos = deHoy
+      .filter((t) => t.estado === 'reservado' && t.inicio + t.duracion > ahora && (rol === 'dueño' || t.barberoId === quien))
+      .sort((a, b) => a.inicio - b.inicio)
+    const mios = deHoy.filter((t) => t.barberoId === quien)
     const mes = hoy.slice(0, 7)
     const nuevos = e.clientes.filter((c) => c.alta.startsWith(mes)).length
     const porMetodo = Object.keys(metodos).map((k) => ({
@@ -48,8 +54,9 @@ export default function Hoy() {
     return {
       deHoy, cobrado: cobrado + ventas, previsto, antes, ocupacion: abiertoMin ? ocupado / abiertoMin : 0,
       proximos, nuevos, porMetodo, atendidos: deHoy.filter((t) => t.estado === 'atendido').length,
+      mios, misAtendidos: mios.filter((t) => t.estado === 'atendido').length,
     }
-  }, [e, alcance, hoy, ahora, semanaPasada])
+  }, [e, alcance, hoy, ahora, semanaPasada, rol, quien])
 
   const espera = e.espera.filter(enAlcance(alcance)).sort((a, b) => a.llegada - b.llegada)
   const stockBajo = e.productos.filter((p) => p.stock <= 4)
@@ -84,8 +91,9 @@ export default function Hoy() {
 
       <section className="hoy-hero" aria-label="Resumen del día">
         <p className="hoy-saludo">
-          {ahora < 780 ? 'Buen día' : ahora < 1200 ? 'Buenas tardes' : 'Buenas noches'}, {negocio.dueño}
+          {ahora < 780 ? 'Buen día' : ahora < 1200 ? 'Buenas tardes' : 'Buenas noches'}, {esDueño ? negocio.dueño : yo?.nombre}
         </p>
+        {esDueño ? <>
         <p className="hoy-plata">
           <small>Cobrado hoy</small>
           <strong>{pesos(d.cobrado)}</strong>
@@ -97,8 +105,14 @@ export default function Hoy() {
             {diferencia >= 0 ? '+' : '−'}{pesos(Math.abs(diferencia))} contra el {fechaLarga(semanaPasada).split(' ')[0]} pasado a esta hora
           </p>
         )}
-        <div className="hoy-avance" aria-label={`${d.atendidos} de ${d.deHoy.length} turnos atendidos`}>
-          {d.deHoy
+        </> : (
+          <p className="hoy-plata">
+            <small>Tus turnos de hoy</small>
+            <strong>{d.mios.length}</strong>
+          </p>
+        )}
+        <div className="hoy-avance" aria-label={esDueño ? `${d.atendidos} de ${d.deHoy.length} turnos atendidos` : `${d.misAtendidos} de ${d.mios.length} turnos atendidos`}>
+          {(esDueño ? d.deHoy : d.mios)
             .slice()
             .sort((x, y) => x.inicio - y.inicio)
             .map((t) => (
@@ -106,7 +120,9 @@ export default function Hoy() {
             ))}
         </div>
         <p className="hoy-cuenta">
-          {d.atendidos} de {d.deHoy.length} turnos atendidos, faltan {pesos(d.previsto)}
+          {esDueño
+            ? `${d.atendidos} de ${d.deHoy.length} turnos atendidos, faltan ${pesos(d.previsto)}`
+            : `${d.misAtendidos} de ${d.mios.length} atendidos · en el salón hay ${d.deHoy.length} turnos hoy`}
         </p>
         {d.proximos[0] && (
           <button className="hoy-proximo" onClick={() => verTurno(d.proximos[0].id)}>
@@ -124,7 +140,7 @@ export default function Hoy() {
         )}
       </section>
 
-      <div className="kpis kpis-dos">
+      {esDueño && <div className="kpis kpis-dos">
         <div className="kpi">
           <span>Por cobrar hoy</span>
           <strong>{pesos(d.previsto)}</strong>
@@ -135,7 +151,7 @@ export default function Hoy() {
           <strong>{Math.round(d.ocupacion * 100)}%</strong>
           <small>de las horas abiertas de hoy</small>
         </div>
-      </div>
+      </div>}
 
       {abiertasHoy.length > 0 && (
         <section aria-labelledby="ahora-titulo">
@@ -231,7 +247,7 @@ export default function Hoy() {
         </div>
 
         <aside className="rail">
-          <h2 className="rail-titulo">Próximos turnos</h2>
+          <h2 className="rail-titulo">{esDueño ? 'Próximos turnos' : 'Tus próximos turnos'}</h2>
           <div className="tarjeta tarjeta-lista">
             {d.proximos.length === 0 && <p className="vacio">No quedan turnos por hoy.</p>}
             <ul className="lista">
@@ -255,6 +271,7 @@ export default function Hoy() {
             <Link to="/admin/agenda" className="boton boton-chico boton-ancho">Ver toda la agenda</Link>
           </div>
 
+          {esDueño && <>
           <h2 className="rail-titulo">Caja de hoy</h2>
           <div className="tarjeta">
             <dl className="ficha ficha-compacta">
@@ -275,6 +292,7 @@ export default function Hoy() {
               ))}
             </dl>
           </div>
+          </>}
         </aside>
       </div>
     </div>

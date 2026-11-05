@@ -122,4 +122,10 @@ export const rene: Negocio = {
     { id: 'shampoo', nombre: 'Shampoo matizador', precio: 14000, stock: 5, muestra: true },
     { id: 'aceite', nombre: 'Aceite de cutículas', precio: 6000, stock: 3, muestra: true },
   ],
+
+  // La demo deja entrar como cliente, como dueño (René: caja y reportes) o como staff (Mica: su día y la agenda).
+  accesos: [
+    { quien: 'rene', rol: 'dueño' },
+    { quien: 'mica', rol: 'empleado' },
+  ],
 }

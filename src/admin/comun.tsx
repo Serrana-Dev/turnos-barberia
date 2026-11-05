@@ -7,7 +7,14 @@ import { estados, metodos, origenes, type Estado, type MetodoPago, type Turno } 
 import { Dialogo } from '../lib/ui'
 
 export type Alcance = SucursalId | 'todas'
-export type Contexto = { alcance: Alcance; nuevoTurno: (p?: Partial<NuevoTurnoDatos>) => void; verTurno: (id: string) => void }
+export type Contexto = {
+  alcance: Alcance
+  /** Quién usa el panel: el dueño ve todo; un empleado (quien = su id), su día sin plata. */
+  rol: 'dueño' | 'empleado'
+  quien: string
+  nuevoTurno: (p?: Partial<NuevoTurnoDatos>) => void
+  verTurno: (id: string) => void
+}
 export const useAdmin = () => useOutletContext<Contexto>()
 
 export const enAlcance = (alcance: Alcance) => (x: { sucursal: SucursalId }) => alcance === 'todas' || x.sucursal === alcance

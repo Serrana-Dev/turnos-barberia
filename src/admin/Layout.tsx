@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { BarChart3, CalendarDays, Clock, Globe, Menu, Plus, RotateCcw, Scissors, Search, Settings, Users, Wallet, UserRound } from 'lucide-react'
 import { negocio, puedeHacer } from '../config/negocio'
 import { aMin, ahoraMin, hoyClave } from '../lib/formato'
@@ -7,6 +7,8 @@ import { franjas, reiniciarDemo, useDemo } from '../lib/store'
 import { PRODUCTO } from '../sitio/comun'
 import { Logo } from '../lib/ui'
 import { DetalleTurno, NuevoTurno, type Alcance, type Contexto, type NuevoTurnoDatos } from './comun'
+import Ingreso from './Ingreso'
+import { delEmpleado, leerSesion, eligeRol, salir, type Sesion } from './sesion'
 
 const menu = [
   { a: '/admin', texto: 'Hoy', icono: Clock, fin: true },
@@ -20,7 +22,15 @@ const menu = [
 ]
 
 export default function Layout() {
+  const [sesion, setSesion] = useState<Sesion | null>(leerSesion)
+  if (!sesion) return <Ingreso alEntrar={setSesion} />
+  return <Panel sesion={sesion} cerrarSesion={() => { salir(); setSesion(null) }} />
+}
+
+function Panel({ sesion, cerrarSesion }: { sesion: Sesion; cerrarSesion: () => void }) {
   const e = useDemo()
+  const esDueño = sesion.rol === 'dueño'
+  const yo = e.equipo.find((b) => b.id === sesion.quien)
   const [alcance, setAlcance] = useState<Alcance>('todas')
   const [menuAbierto, setMenuAbierto] = useState(false)
   const [nuevo, setNuevo] = useState<NuevoTurnoDatos | null>(null)
@@ -37,6 +47,8 @@ export default function Layout() {
   const ctx: Contexto = useMemo(
     () => ({
       alcance,
+      rol: sesion.rol,
+      quien: sesion.quien,
       verTurno: setTurno,
       nuevoTurno: (p) => {
         const sucursal = p?.sucursal ?? (alcance === 'todas' ? negocio.sucursales[0].id : alcance)
@@ -57,8 +69,12 @@ export default function Layout() {
         })
       },
     }),
-    [alcance, e.equipo, e.servicios],
+    [alcance, e.equipo, e.servicios, sesion],
   )
+
+  // Un empleado no entra a caja, reportes, clientes ni precios, aunque escriba la dirección
+  if (!esDueño && !delEmpleado.includes(lugar.pathname.replace(/\/$/, ''))) return <Navigate to="/admin" replace />
+  const menuVisible = esDueño ? menu : menu.filter((m) => delEmpleado.includes(m.a))
 
   const coincidencias = buscar.length > 1 ? e.clientes.filter((c) => c.nombre.toLowerCase().includes(buscar.toLowerCase())).slice(0, 6) : []
 
@@ -80,7 +96,7 @@ export default function Layout() {
           </select>
         </label>
         <nav className="menu">
-          {menu.map(({ a, texto, icono: Icono, fin }) => (
+          {menuVisible.map(({ a, texto, icono: Icono, fin }) => (
             <NavLink key={a} to={a} end={fin}>
               <Icono size={17} strokeWidth={1.8} aria-hidden="true" />
               {texto}
@@ -93,11 +109,16 @@ export default function Layout() {
             <RotateCcw size={16} strokeWidth={1.8} aria-hidden="true" /> Reiniciar demo
           </button>
           <div className="usuario">
-            <span className="persona persona-dueño" aria-hidden="true">{negocio.dueño.slice(0, 2).toUpperCase()}</span>
+            {esDueño || !yo ? (
+              <span className="persona persona-dueño" aria-hidden="true">{negocio.dueño.slice(0, 2).toUpperCase()}</span>
+            ) : (
+              <span className="persona" style={{ ['--tono' as string]: yo.tono }} aria-hidden="true">{yo.nombre.slice(0, 2).toUpperCase()}</span>
+            )}
             <span>
-              <strong>{negocio.dueño}</strong>
-              <small>Dueño</small>
+              <strong>{esDueño ? negocio.dueño : yo?.nombre}</strong>
+              <small>{esDueño ? 'Dueño' : yo?.rol ?? 'Equipo'}</small>
             </span>
+            {eligeRol && <button className="usuario-salir" onClick={cerrarSesion}>Cambiar</button>}
           </div>
           <p className="hecho-con">{negocio.inventado ? `Hecho con ${PRODUCTO}` : 'Hecho por SerranaDev'}</p>
         </div>
@@ -106,7 +127,7 @@ export default function Layout() {
         <button className="btn-icono solo-telefono" onClick={() => setMenuAbierto(!menuAbierto)} aria-label="Menú">
           <Menu size={20} />
         </button>
-        <div className="buscador">
+        {esDueño ? <div className="buscador">
           <Search size={16} className="buscador-icono" aria-hidden="true" />
           <input
             type="search"
@@ -126,7 +147,7 @@ export default function Layout() {
               ))}
             </ul>
           )}
-        </div>
+        </div> : <div className="buscador" />}
         <button className="boton boton-primario" onClick={() => ctx.nuevoTurno()}><Plus size={16} strokeWidth={2.4} aria-hidden="true" /> Nuevo turno</button>
       </header>
       <main className="hoja-admin">

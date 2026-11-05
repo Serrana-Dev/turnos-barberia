@@ -5,7 +5,7 @@ import { Check, Globe, MessageCircle, Plus, Store } from 'lucide-react'
 import { negocio, type Barbero, type SucursalId } from '../config/negocio'
 import { aMin, ahoraMin, capital, fechaCorta, hora, hoyClave, pesos } from '../lib/formato'
 import { franjas, useDemo } from '../lib/store'
-import { Persona, useIndices } from './comun'
+import { Persona, useAdmin, useIndices } from './comun'
 
 const SLOT = 30 // minutos por fila
 const ALTO = 46 // píxeles por fila
@@ -57,6 +57,7 @@ export default function Calendario({
   alDia: (d: string) => void
 }) {
   const e = useDemo()
+  const { rol } = useAdmin()
   const ix = useIndices(e)
   const hoy = hoyClave()
   const [ahora, setAhora] = useState(ahoraMin())
@@ -137,7 +138,7 @@ export default function Calendario({
               <button key={c.clave} className={`cal-col-cabeza cal-dia ${c.dia === hoy ? 'es-hoy' : ''}`} onClick={() => alDia(c.dia)}>
                 <span className="cal-dia-nombre">{capital(fechaCorta(c.dia).split(' ')[0])}</span>
                 <span className="cal-dia-num">{Number(c.dia.slice(8))}</span>
-                <small>{lista.length ? `${lista.length} · ${pesos(total)}` : 'Sin turnos'}</small>
+                <small>{lista.length ? (rol === 'dueño' ? `${lista.length} · ${pesos(total)}` : `${lista.length} turnos`) : 'Sin turnos'}</small>
               </button>
             )
           })}

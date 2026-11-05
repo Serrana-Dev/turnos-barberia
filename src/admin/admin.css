@@ -3187,3 +3187,133 @@ html {
 .kpis-dos {
   grid-template-columns: 1fr 1fr;
 }
+
+/* ——— Entrada de la demo: cliente, dueño o staff (solo en las demos con accesos, como René) ——— */
+.ingreso {
+  --ingreso-fondo: #0a0a0c;
+  --ingreso-tarjeta: #17171d;
+  --ingreso-borde: #2a2a33;
+  --ingreso-texto: #f2f2f5;
+  --ingreso-tenue: #a4a6b4;
+  --ingreso-acento: var(--marca);
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: var(--ingreso-fondo);
+  color: var(--ingreso-texto);
+  font-family: 'Archivo', system-ui, sans-serif;
+}
+[data-negocio='rene'] .ingreso {
+  --ingreso-fondo: var(--rene-noche);
+  --ingreso-tarjeta: #13234b;
+  --ingreso-borde: #2a3c6b;
+  --ingreso-tenue: #b9c1d8;
+  --ingreso-acento: var(--rene-cobre);
+}
+.ingreso-caja {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+.ingreso h1 {
+  margin: 4px 0 0;
+  font-size: 24px;
+  line-height: 1.2;
+}
+[data-negocio='rene'] .ingreso h1 {
+  font-family: var(--rene-letra);
+  font-size: 30px;
+}
+.ingreso-bajada {
+  margin: 0 0 4px;
+  color: var(--ingreso-tenue);
+  font-size: 15px;
+}
+.ingreso-personas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: grid;
+  gap: 10px;
+}
+.ingreso-opcion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--ingreso-borde);
+  border-radius: 14px;
+  background: var(--ingreso-tarjeta);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.ingreso-opcion:hover {
+  border-color: var(--ingreso-acento);
+}
+.ingreso-opcion > span:not(.persona):not(.ingreso-icono) {
+  flex: 1;
+  min-width: 0;
+}
+.ingreso-opcion .persona,
+.ingreso-icono {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  font-size: 14px;
+}
+.ingreso-icono {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ingreso-acento);
+  color: #0a0a0c;
+}
+.ingreso-opcion strong {
+  display: block;
+  font-size: 15.5px;
+}
+.ingreso-opcion small {
+  color: var(--ingreso-tenue);
+  font-size: 13px;
+}
+.ingreso-flecha {
+  flex: none;
+  color: var(--ingreso-tenue);
+}
+.ingreso-nota {
+  margin: 4px 0 0;
+  color: var(--ingreso-tenue);
+  font-size: 12.5px;
+}
+.ingreso :focus-visible {
+  outline: 2px solid var(--ingreso-acento);
+  outline-offset: 2px;
+}
+
+/* El que entra y el botón para salir */
+.usuario-salir {
+  margin-left: auto;
+  padding: 4px 8px;
+  border: 1px solid var(--marco-2);
+  border-radius: 8px;
+  background: none;
+  color: var(--marco-texto);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.usuario-salir:hover {
+  color: #fff;
+  border-color: var(--marco-texto);
+}

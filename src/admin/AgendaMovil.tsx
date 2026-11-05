@@ -27,7 +27,7 @@ const leerVista = (): Vista => {
 export default function AgendaMovil({ dia, alcance, ir }: { dia: string; alcance: Alcance; ir: (c: Record<string, string>) => void }) {
   const e = useDemo()
   const ix = useIndices(e)
-  const { verTurno, nuevoTurno } = useAdmin()
+  const { verTurno, nuevoTurno, rol } = useAdmin()
   const hoy = hoyClave()
   const ahora = ahoraMin()
   const [quien, setQuien] = useState<string>('todos')
@@ -159,7 +159,7 @@ export default function AgendaMovil({ dia, alcance, ir }: { dia: string; alcance
       <p className="am-resumen">
         <strong>{capital(fechaLarga(dia))}</strong>
         <span>
-          {turnos.length} {turnos.length === 1 ? 'turno' : 'turnos'}, {atendidos} atendidos, {pesos(total)}
+          {turnos.length} {turnos.length === 1 ? 'turno' : 'turnos'}, {atendidos} atendidos{rol === 'dueño' && `, ${pesos(total)}`}
         </span>
       </p>
 

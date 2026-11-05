@@ -80,7 +80,7 @@ function useAngosto() {
 
 export default function Agenda() {
   const e = useDemo()
-  const { alcance: global, verTurno, nuevoTurno } = useAdmin()
+  const { alcance: global, verTurno, nuevoTurno, rol } = useAdmin()
   const [q, setQ] = useSearchParams()
   const hoy = hoyClave()
   const dia = q.get('dia') ?? hoy
@@ -127,7 +127,7 @@ export default function Agenda() {
         <div>
           <h1>Agenda</h1>
           <p>
-            {titulo} · {resumen.lista.length} turnos · {pesos(resumen.total)}
+            {titulo} · {resumen.lista.length} turnos{rol === 'dueño' && ` · ${pesos(resumen.total)}`}
           </p>
         </div>
         <div className="controles">
@@ -193,7 +193,7 @@ export default function Agenda() {
               <div><dt>Turnos</dt><dd>{resumen.lista.length}</dd></div>
               <div><dt>Atendidos</dt><dd>{resumen.atendidos}</dd></div>
               <div><dt>No vinieron</dt><dd className={resumen.ausentes ? 'mal' : ''}>{resumen.ausentes}</dd></div>
-              <div className="ficha-total"><dt>En servicios</dt><dd>{pesos(resumen.total)}</dd></div>
+              {rol === 'dueño' && <div className="ficha-total"><dt>En servicios</dt><dd>{pesos(resumen.total)}</dd></div>}
             </dl>
             <div className="origenes">
               {resumen.porOrigen.map(({ o, n }) => (

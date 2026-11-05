@@ -56,6 +56,9 @@ export type Producto = {
   muestra?: boolean
 }
 
+/** Cómo se puede entrar al panel en la demo. El dueño ve todo; un empleado (staff), su día y la agenda. */
+export type Acceso = { quien: string; rol: 'dueño' | 'empleado' }
+
 export type Foto = { src: string; ancho: number; alto: number; alt: string; titulo?: string; autor: string }
 
 export type Negocio = {
@@ -105,6 +108,8 @@ export type Negocio = {
   estilo?: boolean
   /** Qué tan lleno está el local en la demo (1 = como una barbería grande; 0,6 = un salón chico). */
   ocupacion?: number
+  /** Si la demo deja elegir cómo entrar (cliente, dueño o staff). Sin esto entra directo como dueño. quien = id del equipo. */
+  accesos?: Acceso[]
 }
 
 export const gruposDe = (n: Negocio): [string, string][] =>
