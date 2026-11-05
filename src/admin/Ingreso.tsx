@@ -39,9 +39,9 @@ export default function Ingreso({ alEntrar }: { alEntrar: (s: Sesion) => void })
             return (
               <li key={a.quien}>
                 <button className="ingreso-opcion" onClick={() => { const s = entrar(a.quien); if (s) alEntrar(s) }}>
-                  <Persona b={b} />
+                  <Persona b={dueño ? { nombre: negocio.dueño, tono: b.tono } : b} />
                   <span>
-                    <strong>{dueño ? `Dueño · ${b.nombre}` : `Staff · ${b.nombre}`}</strong>
+                    <strong>{dueño ? `Dueño · ${negocio.dueño}` : `Staff · ${b.nombre}`}</strong>
                     <small>{dueño ? 'Todo: caja, reportes, precios y equipo.' : 'Su día y la agenda. Sin caja ni reportes.'}</small>
                   </span>
                   <ChevronRight size={18} className="ingreso-flecha" aria-hidden="true" />

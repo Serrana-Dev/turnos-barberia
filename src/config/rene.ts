@@ -27,7 +27,7 @@ export const rene: Negocio = {
   ciudad: 'Villa Carlos Paz',
   provincia: 'Córdoba',
   instagram: 'rene.internacional',
-  dueño: 'René',
+  dueño: 'Charly',
   inventado: false,
   bajada: 'Salón de estética unisex en Villa Carlos Paz: barbería y peluquería, y muy pronto uñas. En Av. San Martín 931.',
   // El cobre del sello RI; los bloques oscuros van en el azul noche de las paredes del salón
@@ -60,7 +60,7 @@ export const rene: Negocio = {
       foto: f.lunes,
       acento: true,
       boton: 'Pedir turno para el martes',
-      whatsapp: 'Hola René! Quiero un turno para corte el martes',
+      whatsapp: 'Hola! Quiero un turno para corte el martes',
     },
   ],
   creditos: {
@@ -111,9 +111,9 @@ export const rene: Negocio = {
     { id: 'pies', nombre: 'Belleza de pies', descripcion: 'Pedicura completa.', grupo: 'Uñas', precio: 0, duracion: 60, online: false },
   ],
 
-  // Equipo de muestra: René en barbería (de martes a sábado, como los precios del corte) y Mica en peluquería.
+  // Equipo de muestra: Charly (el dueño) en barbería (de martes a sábado, como los precios del corte) y Mica en peluquería.
   equipo: [
-    { id: 'rene', nombre: 'René', sucursal: 'san-martin', tono: 22, comision: 0, desde: '2009', franco: 1, rol: 'Barbería', hace: ['Barbería'] },
+    { id: 'rene', nombre: 'Charly', sucursal: 'san-martin', tono: 22, comision: 0, desde: '2009', franco: 1, rol: 'Barbería', hace: ['Barbería'] },
     { id: 'mica', nombre: 'Mica', sucursal: 'san-martin', tono: 330, comision: 45, desde: '2022', rol: 'Peluquería, color y tratamientos', hace: ['Peluquería'] },
   ],
 
@@ -123,7 +123,7 @@ export const rene: Negocio = {
     { id: 'aceite', nombre: 'Aceite de cutículas', precio: 6000, stock: 3, muestra: true },
   ],
 
-  // La demo deja entrar como cliente, como dueño (René: caja y reportes) o como staff (Mica: su día y la agenda).
+  // La demo deja entrar como cliente, como dueño (Charly: caja y reportes) o como staff (Mica: su día y la agenda).
   accesos: [
     { quien: 'rene', rol: 'dueño' },
     { quien: 'mica', rol: 'empleado' },

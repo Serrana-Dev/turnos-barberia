@@ -301,6 +301,8 @@
   [data-negocio='rene'] .servicio-reservar {
     grid-area: boton;
     align-self: end;
+    /* A la derecha siempre, aunque el precio ("desde $10.000") ensanche la columna */
+    justify-self: end;
     display: grid;
     place-items: center;
     width: 40px;
@@ -340,10 +342,16 @@
 [data-negocio='rene'] .servicio-precio small {
   color: var(--rene-cobre-claro);
 }
+/* Lo que viene (uñas): en la compu es una fila más, apagada; en el celular, la tarjeta con borde punteado */
 [data-negocio='rene'] .servicio-pronto {
-  opacity: 1;
-  border-style: dashed !important;
-  background: none !important;
+  opacity: 0.75;
+}
+@media (max-width: 900px) {
+  [data-negocio='rene'] .servicio-pronto {
+    opacity: 1;
+    border-style: dashed;
+    background: none;
+  }
 }
 [data-negocio='rene'] .servicio-pronto .servicio-precio {
   padding: 2px 10px;
