@@ -15,9 +15,9 @@ function enlaceCalendario(t: Turno, titulo: string, lugar: string) {
   const ics = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Sillon//Turnos//ES',
+    'PRODID:-//SerranaDev//Turnos//ES',
     'BEGIN:VEVENT',
-    `UID:${t.id}@sillon`,
+    `UID:${t.id}@serranadev`,
     `DTSTART:${fecha(t.inicio)}`,
     `DTEND:${fecha(t.inicio + t.duracion)}`,
     `SUMMARY:${titulo}`,
@@ -104,15 +104,30 @@ export default function Reservar() {
 
   const [suc, setSuc] = useState<SucursalId | null>((q.get('suc') as SucursalId) || (unaSucursal ? negocio.sucursales[0].id : null))
   const [servicio, setServicio] = useState<string | null>(q.get('servicio'))
+  // Servicios que se suman al mismo turno, a continuación y con la misma persona (corte + barba, corte + color)
+  const [extras, setExtras] = useState<string[]>([])
   const [barbero, setBarbero] = useState<string | null>(q.get('barbero') ?? (q.get('suc') ? 'cualquiera' : null))
   const [dia, setDia] = useState<string | null>(q.get('dia'))
   const [inicio, setInicio] = useState<number | null>(q.get('hora') ? Number(q.get('hora')) : null)
   const [nombre, setNombre] = useState('')
   const [tel, setTel] = useState('')
-  const [hecho, setHecho] = useState<Turno | null>(null)
+  const [hechos, setHechos] = useState<Turno[]>([])
 
-  const pasos: Paso[] = unaSucursal ? ['servicio', 'barbero', 'hora', 'datos'] : ['suc', 'servicio', 'barbero', 'hora', 'datos']
-  const completo: Record<Paso, boolean> = { suc: !!suc, servicio: !!servicio, barbero: !!barbero, hora: dia !== null && inicio !== null, datos: false }
+  const s = e.servicios.find((x) => x.id === servicio)
+  const elegidos = [s, ...extras.map((id) => e.servicios.find((x) => x.id === id))].filter((x) => x !== undefined)
+  const largo = elegidos.reduce((total, x) => total + x.duracion, 0)
+  const precioTotal = (d?: string) => elegidos.reduce((total, x) => total + precioDe(x, d), 0)
+  const nombresElegidos = elegidos.map((x) => x.nombre).join(' + ')
+  // Solo quienes hacen el servicio elegido (en un salón unisex, las uñas no las hace el barbero)
+  const equipo = e.equipo.filter((b) => b.sucursal === suc && puedeHacer(b, s))
+  // Si una sola persona hace el servicio, no se pregunta con quién
+  const unaPersona = !!s && equipo.length === 1
+  const elegido = unaPersona ? equipo[0].id : barbero
+
+  const pasos = (unaSucursal ? ['servicio', 'barbero', 'hora', 'datos'] : ['suc', 'servicio', 'barbero', 'hora', 'datos']).filter(
+    (p) => p !== 'barbero' || !unaPersona,
+  ) as Paso[]
+  const completo: Record<Paso, boolean> = { suc: !!suc, servicio: !!servicio, barbero: !!elegido, hora: dia !== null && inicio !== null, datos: false }
   const primeroQueFalta = Math.max(0, pasos.findIndex((p) => !completo[p]))
   const [paso, setPaso] = useState(primeroQueFalta)
   const [haciaAtras, setHaciaAtras] = useState(false)
@@ -133,15 +148,30 @@ export default function Reservar() {
     cuerpo.current?.focus({ preventScroll: true })
   }, [paso])
 
-  const s = e.servicios.find((x) => x.id === servicio)
   // Con muchos servicios (barbería, peluquería y uñas) se elige primero el rubro, para no scrollear de más
   const rubros = gruposDe(negocio).filter(([g]) => e.servicios.some((x) => x.online && x.grupo === g))
   const conPestanas = !!negocio.grupos && rubros.length > 1
   const [rubro, setRubro] = useState(() => s?.grupo ?? rubros[0]?.[0])
   const sucursal = negocio.sucursales.find((x) => x.id === suc)
-  // Solo quienes hacen el servicio elegido (en un salón unisex, las uñas no las hace el barbero)
-  const equipo = e.equipo.filter((b) => b.sucursal === suc && puedeHacer(b, s))
-  const quien = barbero === 'cualquiera' ? undefined : barbero ?? undefined
+  const quien = elegido === 'cualquiera' ? undefined : elegido ?? undefined
+  // Lo que se puede sumar: lo que hace la persona elegida, o alguien que también hace el primer servicio
+  // Sin combos que ya incluyen lo elegido: con "Corte" no se ofrece "Corte y barba", y al revés
+  const partes = (n: string) => n.toLowerCase().split(' y ')
+  const repite = (a: string, b: string) => partes(a).length > 1 && partes(a).includes(b.toLowerCase())
+  const sumables = s
+    ? e.servicios.filter(
+        (x) =>
+          x.online &&
+          x.id !== s.id &&
+          !repite(x.nombre, s.nombre) &&
+          !repite(s.nombre, x.nombre) &&
+          equipo.some((b) => (!quien || b.id === quien) && puedeHacer(b, x)),
+      )
+    : []
+  const alternarExtra = (id: string) => {
+    setExtras((xs) => (xs.includes(id) ? xs.filter((x) => x !== id) : [...xs, id]))
+    setInicio(null)
+  }
 
   const diasAbiertos = useMemo(() => {
     if (!suc) return []
@@ -155,13 +185,16 @@ export default function Reservar() {
 
   const libresPorDia = useMemo(() => {
     const m: Record<string, number> = {}
-    if (suc && servicio) for (const d of diasAbiertos) m[d] = huecos(e, suc, d, servicio, quien).length
+    if (suc && servicio) for (const d of diasAbiertos) m[d] = huecos(e, suc, d, servicio, quien, extras).length
     return m
-  }, [e, suc, servicio, quien, diasAbiertos])
+  }, [e, suc, servicio, quien, extras, diasAbiertos])
 
   // Si todavía no hay día elegido, se muestra el primero con lugar
   const diaVisto = dia ?? diasAbiertos.find((d) => libresPorDia[d]) ?? diasAbiertos[0] ?? null
-  const libres = useMemo(() => (suc && servicio && diaVisto ? huecos(e, suc, diaVisto, servicio, quien) : []), [e, suc, servicio, diaVisto, quien])
+  const libres = useMemo(
+    () => (suc && servicio && diaVisto ? huecos(e, suc, diaVisto, servicio, quien, extras) : []),
+    [e, suc, servicio, diaVisto, quien, extras],
+  )
 
   /** El primer lugar de cada barbero, para elegir con quién sabiendo cuándo puede. */
   const primeroDe = useMemo(() => {
@@ -180,22 +213,30 @@ export default function Reservar() {
     return m
   }, [e, suc, servicio, equipo, diasAbiertos])
 
-  const hueco = dia && inicio !== null ? huecos(e, suc ?? '', dia, servicio ?? '', quien).find((h) => h.inicio === inicio) : undefined
-  const barberoFinal = barbero && barbero !== 'cualquiera' ? barbero : hueco?.barberoId
+  const hueco = dia && inicio !== null ? huecos(e, suc ?? '', dia, servicio ?? '', quien, extras).find((h) => h.inicio === inicio) : undefined
+  const barberoFinal = elegido && elegido !== 'cualquiera' ? elegido : hueco?.barberoId
   const cuandoTexto = (x: { dia: string; inicio: number } | null) => (x ? `${capital(fechaRelativa(x.dia))}, ${hora(x.inicio)}` : 'Sin lugar en dos semanas')
 
   function confirmar(ev: FormEvent) {
     ev.preventDefault()
     if (!suc || !servicio || !dia || inicio === null || !barberoFinal) return
     const cliente = crearCliente({ nombre: nombre.trim(), telefono: tel.trim() })
-    const t = crearTurno({ clienteId: cliente.id, barberoId: barberoFinal, servicioId: servicio, sucursal: suc, dia, inicio, origen: 'web' })
-    setHecho(t)
+    // Un turno por servicio, uno detrás del otro: así la agenda, la caja y las comisiones siguen por servicio
+    let desde = inicio
+    const turnos = elegidos.map((x) => {
+      const t = crearTurno({ clienteId: cliente.id, barberoId: barberoFinal, servicioId: x.id, sucursal: suc, dia, inicio: desde, origen: 'web' })
+      desde += x.duracion
+      return t
+    })
+    setHechos(turnos)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  if (hecho) {
+  if (hechos.length) {
+    const hecho = { ...hechos[0], duracion: hechos.reduce((total, t) => total + t.duracion, 0) }
     const b = e.equipo.find((x) => x.id === hecho.barberoId)!
-    const sv = e.servicios.find((x) => x.id === hecho.servicioId)!
+    const sv = { nombre: hechos.map((t) => e.servicios.find((x) => x.id === t.servicioId)!.nombre).join(' + ') }
+    const totalHecho = hechos.reduce((total, t) => total + t.precio, 0)
     const sc = negocio.sucursales.find((x) => x.id === hecho.sucursal)!
     return (
       <div className="reservar">
@@ -212,7 +253,7 @@ export default function Reservar() {
               {capital(fechaRelativa(hecho.dia) === 'hoy' || fechaRelativa(hecho.dia) === 'mañana' ? fechaRelativa(hecho.dia) : fechaLarga(hecho.dia))} a las {hora(hecho.inicio)}
             </h1>
             <dl className="confirmado-datos">
-              <div><dt>Servicio</dt><dd>{sv.nombre}, {pesos(hecho.precio)}</dd></div>
+              <div><dt>{hechos.length > 1 ? 'Servicios' : 'Servicio'}</dt><dd>{sv.nombre}, {pesos(totalHecho)}</dd></div>
               <div><dt>{personaDe(negocio)[0]}</dt><dd>{b.nombre}</dd></div>
               <div><dt>Dónde</dt><dd>{sc.direccion}, {unaSucursal ? sc.ciudad : sc.nombre}</dd></div>
               <div><dt>A nombre de</dt><dd>{nombre}</dd></div>
@@ -265,8 +306,8 @@ export default function Reservar() {
   // Lo elegido hasta ahora, abajo como en las apps de turnos
   const resumen = [
     !unaSucursal && sucursal ? sucursal.nombre : null,
-    s ? s.nombre : null,
-    barbero ? (barbero === 'cualquiera' ? 'El primero libre' : equipo.find((b) => b.id === barbero)?.nombre) : null,
+    s ? nombresElegidos : null,
+    elegido ? (elegido === 'cualquiera' ? 'El primero libre' : equipo.find((b) => b.id === elegido)?.nombre) : null,
     dia && inicio !== null ? `${capital(fechaRelativa(dia))} ${hora(inicio)}` : null,
   ].filter(Boolean) as string[]
 
@@ -320,9 +361,10 @@ export default function Reservar() {
                     {lista.map((x) => (
                       <Opcion key={x.id} elegida={servicio === x.id} onClick={() => {
                         setServicio(x.id)
+                        setExtras([])
                         setInicio(null)
-                        const elegido = e.equipo.find((b) => b.id === barbero)
-                        if (elegido && !puedeHacer(elegido, x)) setBarbero(null)
+                        const previo = e.equipo.find((b) => b.id === barbero)
+                        if (previo && !puedeHacer(previo, x)) setBarbero(null)
                         siguiente()
                       }}>
                         <span className="opcion-texto">
@@ -369,6 +411,25 @@ export default function Reservar() {
 
           {actual === 'hora' && (
             <>
+              {sumables.length > 0 && (
+                <details className="sumar" open={extras.length > 0}>
+                  <summary>
+                    <span>
+                      <strong>{nombresElegidos}</strong>
+                      <small>{duracion(largo)}</small>
+                    </span>
+                    <span className="sumar-accion">Sumar otro servicio</span>
+                  </summary>
+                  <div className="sumar-lista">
+                    {sumables.map((x) => (
+                      <button key={x.id} type="button" className={`sumar-chip ${extras.includes(x.id) ? 'activa' : ''}`} aria-pressed={extras.includes(x.id)} onClick={() => alternarExtra(x.id)}>
+                        {extras.includes(x.id) ? <Check size={14} strokeWidth={3} aria-hidden="true" /> : '+'} {x.nombre}
+                        <small>{duracion(x.duracion)} · {x.precioPorDia ? 'desde ' : ''}{pesos(x.precio)}</small>
+                      </button>
+                    ))}
+                  </div>
+                </details>
+              )}
               <div className="dias" role="listbox" aria-label="Día">
                 {diasAbiertos.map((d) => (
                   <button
@@ -381,8 +442,8 @@ export default function Reservar() {
                   >
                     <span>{d === hoy ? 'Hoy' : fechaCorta(d).split(' ')[0]}</span>
                     <strong>{Number(d.slice(8))}</strong>
-                    <small className={s?.precioPorDia && libresPorDia[d] ? 'dia-precio' : ''}>
-                      {!libresPorDia[d] ? 'Sin lugar' : s?.precioPorDia ? pesos(precioDe(s, d)) : libresPorDia[d] === 1 ? '1 libre' : `${libresPorDia[d]} libres`}
+                    <small className={elegidos.some((x) => x.precioPorDia) && libresPorDia[d] ? 'dia-precio' : ''}>
+                      {!libresPorDia[d] ? 'Sin lugar' : elegidos.some((x) => x.precioPorDia) ? pesos(precioTotal(d)) : libresPorDia[d] === 1 ? '1 libre' : `${libresPorDia[d]} libres`}
                     </small>
                   </button>
                 ))}
@@ -422,13 +483,14 @@ export default function Reservar() {
                     {capital(fechaRelativa(dia))} a las {hora(inicio)}
                   </p>
                   <p>
-                    {s.nombre} con {equipo.find((b) => b.id === barberoFinal)?.nombre ?? 'el primero libre'}
+                    {nombresElegidos} con {equipo.find((b) => b.id === barberoFinal)?.nombre ?? 'el primero libre'}
+                    {elegidos.length > 1 && `, ${duracion(largo)}`}
                   </p>
                   <p>
                     {sucursal?.direccion}, {sucursal?.nombre}
                   </p>
                   <p className="datos-ticket-total">
-                    {pesos(precioDe(s, dia ?? diaVisto ?? undefined))} <small>se paga en el local</small>
+                    {pesos(precioTotal(dia ?? diaVisto ?? undefined))} <small>se paga en el local</small>
                   </p>
                 </div>
               )}
@@ -463,7 +525,7 @@ export default function Reservar() {
             {resumen.map((r) => (
               <span key={r}>{r}</span>
             ))}
-            {s && <strong>{pesos(precioDe(s, actual === 'hora' || dia ? (dia ?? diaVisto ?? undefined) : undefined))}</strong>}
+            {s && <strong>{pesos(precioTotal(actual === 'hora' || dia ? (dia ?? diaVisto ?? undefined) : undefined))}</strong>}
           </div>
           {actual === 'datos' ? (
             <button className="btn btn-primario btn-ancho" type="submit" form="form-datos" disabled={!nombre.trim() || !tel.trim()}>

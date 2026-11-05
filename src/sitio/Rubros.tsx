@@ -1,6 +1,6 @@
 // Los rubros del salón (Barbería, Peluquería, Uñas) como las historias destacadas de Instagram:
 // un círculo con foto por rubro, el elegido con el aro de color. Se usa en Precios y al sacar turno.
-import { negocio } from '../config/negocio'
+import { negocio, precioDesde } from '../config/negocio'
 import { pesos } from '../lib/formato'
 
 export type Rubro = { id: string; titulo: string; desde: number; cuantos: number }
@@ -43,11 +43,11 @@ export function Rubros({
 }
 
 /** Los rubros con servicios, con su precio más bajo, a partir de la lista. */
-export function armarRubros(grupos: [string, string][], servicios: { grupo: string; precio: number; online?: boolean }[]): Rubro[] {
+export function armarRubros(grupos: [string, string][], servicios: { grupo: string; precio: number; online?: boolean; muestra?: boolean }[]): Rubro[] {
   return grupos
     .map(([id, titulo]) => {
       const lista = servicios.filter((s) => s.grupo === id)
-      return { id, titulo, cuantos: lista.length, desde: Math.min(...lista.map((s) => s.precio).filter((x) => x > 0), Infinity) }
+      return { id, titulo, cuantos: lista.length, desde: precioDesde(lista) }
     })
     .filter((r) => r.cuantos > 0)
 }

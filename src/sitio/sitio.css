@@ -1766,6 +1766,77 @@
   color: #fff;
 }
 
+/* El paso que entra deslizándose no corre la página de costado mientras se anima */
+.reservar-pasos .reservar-cuerpo {
+  overflow-x: clip;
+}
+
+/* Sumar otro servicio al mismo turno: lo elegido arriba y los servicios que se pueden agregar como chips */
+.sumar {
+  border-radius: 16px;
+  background: var(--fondo);
+}
+.sumar summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+.sumar summary::-webkit-details-marker {
+  display: none;
+}
+.sumar summary > span:first-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.sumar summary small {
+  color: var(--gris);
+}
+.sumar-accion {
+  flex: none;
+  color: var(--marca-tinta);
+  font-weight: 700;
+  font-size: 15px;
+}
+.sumar[open] .sumar-accion {
+  color: var(--gris);
+}
+.sumar-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+.sumar-chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 48px;
+  padding: 8px 14px;
+  border: 1px solid var(--linea, rgb(0 0 0 / 0.12));
+  border-radius: 14px;
+  background: #fff;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.sumar-chip small {
+  color: var(--gris);
+  font-weight: 500;
+}
+.sumar-chip.activa {
+  border-color: var(--marca);
+  background: var(--marca-claro);
+  color: var(--marca-tinta);
+}
+
 .datos-ticket {
   position: relative;
   display: flex;

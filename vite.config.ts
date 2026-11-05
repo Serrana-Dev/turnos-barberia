@@ -6,7 +6,7 @@ type Cabeza = { titulo: string; descripcion: string; icono: string; color?: stri
 const cabeza: Record<string, Cabeza> = {
   filo: {
     titulo: 'Barbería Filo, turnos online en Córdoba',
-    descripcion: 'Sacá turno online en Barbería Filo, Centro o Güemes. Demo de Sillón para barberías.',
+    descripcion: 'Sacá turno online en Barbería Filo, Centro o Güemes. Demo de Filo, turnos online para barberías.',
     icono: 'favicon-filo.svg',
   },
   ayrton: {

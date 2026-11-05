@@ -99,7 +99,7 @@ export default function Layout() {
               <small>Dueño</small>
             </span>
           </div>
-          <p className="hecho-con">Hecho con {PRODUCTO}</p>
+          <p className="hecho-con">{negocio.inventado ? `Hecho con ${PRODUCTO}` : 'Hecho por SerranaDev'}</p>
         </div>
       </aside>
       <header className="superior">

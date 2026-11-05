@@ -51,7 +51,7 @@ export const rene: Negocio = {
   local: [
     {
       titulo: 'Con turno o por orden de llegada',
-      texto: 'Reservá acá y te esperamos a la hora justa. Si pasás sin turno, te anotamos en la lista y te avisamos por WhatsApp cuando se libera un sillón.',
+      texto: 'Reservá acá y te esperamos a la hora justa. Si pasás sin turno, te anotamos en la lista de espera del salón y te decimos cuánto falta.',
       foto: f.viernes,
     },
     {
@@ -93,6 +93,8 @@ export const rene: Negocio = {
   // La foto de cada rubro, como las historias destacadas de su Instagram (la de uñas es de rawpixel, CC0)
   fotosGrupo: { Barbería: 'img/rene/fade.jpg', Peluquería: 'img/rene/asi.jpg', Uñas: 'img/rene/unas.jpg' },
   estilo: true,
+  // Un salón chico (27 opiniones en Google): la demo no lo muestra lleno como a una barbería grande
+  ocupacion: 0.6,
 
   // Del catálogo de WhatsApp de René (noviembre 2026): los servicios, el precio del corte masculino según el día
   // y uñas como "próximamente". Los demás precios no están publicados: son de muestra.

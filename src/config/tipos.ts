@@ -103,6 +103,8 @@ export type Negocio = {
   proximamente?: string[]
   /** Una estética propia: se aplica con [data-negocio] en el CSS. */
   estilo?: boolean
+  /** Qué tan lleno está el local en la demo (1 = como una barbería grande; 0,6 = un salón chico). */
+  ocupacion?: number
 }
 
 export const gruposDe = (n: Negocio): [string, string][] =>
@@ -126,6 +128,14 @@ export function precioDe(s: { precio: number; precioPorDia?: Record<number, numb
   if (!dia || !s.precioPorDia) return s.precio
   const dow = new Date(`${dia}T12:00:00`).getDay()
   return s.precioPorDia[dow] ?? s.precio
+}
+
+/** El precio más bajo para mostrar como "desde". Si hay precios confirmados, no usa los de muestra. */
+export function precioDesde(servicios: { precio: number; muestra?: boolean }[]) {
+  const conPrecio = servicios.filter((s) => s.precio > 0)
+  const confirmados = conPrecio.filter((s) => !s.muestra)
+  const lista = confirmados.length ? confirmados : conPrecio
+  return Math.min(...lista.map((s) => s.precio), Infinity)
 }
 
 /** Los tramos de precio por día, cortos: [{ dias: 'Mar', precio }, { dias: 'Mié y Jue', precio }, …]. */

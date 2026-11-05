@@ -4,7 +4,7 @@ import { negocio, precioDe, puedeHacer, type Servicio } from '../config/negocio'
 import { aMin, ahoraMin, deClave, hoyClave, sumarDias } from './formato'
 import type { Cliente, Estado, MetodoPago, Movimiento, Origen, Turno, EnEspera } from './tipos'
 
-export const VERSION = 9
+export const VERSION = 10
 
 function azar(semilla: number) {
   let a = semilla >>> 0
@@ -130,6 +130,7 @@ export function generar(): Estado {
       let ocupacion = d < 0 ? 0.74 : d === 0 ? 0.8 : Math.max(0.12, 0.66 - d * 0.04)
       if (dow === 6) ocupacion += 0.12
       if (dow === 5) ocupacion += 0.06
+      ocupacion *= negocio.ocupacion ?? 1
       for (const [desde, hasta] of franjas) {
         let t = aMin(desde)
         const fin = aMin(hasta)

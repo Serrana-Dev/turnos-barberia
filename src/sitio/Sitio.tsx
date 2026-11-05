@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
-import { gruposDe, negocio, precioDe, preciosPorDia, puedeHacer, type SucursalId } from '../config/negocio'
+import { gruposDe, negocio, precioDe, precioDesde, preciosPorDia, puedeHacer, type SucursalId } from '../config/negocio'
 import { aMin, ahoraMin, capital, duracion, fechaRelativa, hora, hoyClave, pesos, sumarDias } from '../lib/formato'
 import { franjas, huecos, proximoLibre, useDemo } from '../lib/store'
 import { Logo } from '../lib/ui'
@@ -405,7 +405,7 @@ function Resenas() {
               </li>
             ))}
           </ul>
-          {!todas && (
+          {!todas && negocio.reseñas.length > 4 && (
             <button className="btn btn-secundario resenas-mas" onClick={() => setTodas(true)}>
               {negocio.reseñas.length - 4 === 1 ? 'Ver una reseña más' : `Ver ${negocio.reseñas.length - 4} reseñas más`}
             </button>
@@ -523,7 +523,7 @@ function Pie() {
 
 /** En el celular, la acción principal queda siempre a mano abajo. */
 function BarraTurno() {
-  const desde = Math.min(...negocio.servicios.filter((s) => s.online && s.precio > 0).map((s) => s.precio))
+  const desde = precioDesde(negocio.servicios.filter((s) => s.online))
   return (
     <div className="barra-turno">
       <p>

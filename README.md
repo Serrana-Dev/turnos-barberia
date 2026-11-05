@@ -1,6 +1,10 @@
-# Sillón · turnos online para barberías
+# Filo · turnos online para barberías
 
 Demo visual de un sistema de turnos para barberías y peluquerías. Es todo frontend: no hay servidor ni base de datos.
+
+Filo es el producto que se vende en general (la demo de Barbería Filo). Ayrton y René son proyectos aparte para dos
+clientes, con sus datos reales; por ahora salen del mismo código con un modo por negocio.
+
 Los datos de prueba se generan solos y se guardan en el navegador de quien la abre.
 
 El mismo código arma tres demos, cada una con sus datos, colores, logo y fotos:

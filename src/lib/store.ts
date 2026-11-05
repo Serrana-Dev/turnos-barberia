@@ -134,19 +134,23 @@ export function abierto(sucursal: SucursalId, dia: string) {
 }
 
 /** Horarios libres para un servicio en un día, con el barbero elegido o cualquiera. */
-export function huecos(e: Estado, sucursal: SucursalId, dia: string, servicioId: string, barberoId?: string): Hueco[] {
-  const servicio = e.servicios.find((s) => s.id === servicioId)
-  if (!servicio) return []
+/** Horarios libres para el servicio, y para los extras que se hacen a continuación con la misma persona. */
+export function huecos(e: Estado, sucursal: SucursalId, dia: string, servicioId: string, barberoId?: string, extras: string[] = []): Hueco[] {
+  const servicios = [servicioId, ...extras].map((id) => e.servicios.find((s) => s.id === id))
+  if (servicios.some((s) => !s)) return []
+  const largo = servicios.reduce((total, s) => total + s!.duracion, 0)
   const dow = deClave(dia).getDay()
-  const equipo = e.equipo.filter((b) => b.sucursal === sucursal && b.franco !== dow && (!barberoId || b.id === barberoId) && puedeHacer(b, servicio))
+  const equipo = e.equipo.filter(
+    (b) => b.sucursal === sucursal && b.franco !== dow && (!barberoId || b.id === barberoId) && servicios.every((s) => puedeHacer(b, s)),
+  )
   const ocupados = e.turnos.filter((t) => t.dia === dia && t.sucursal === sucursal && t.estado !== 'cancelado')
   const minimo = dia === hoyClave() ? ahoraMin() + 20 : 0
   const libres: Hueco[] = []
   for (const [desde, hasta] of franjas(sucursal, dia)) {
-    for (let t = aMin(desde); t + servicio.duracion <= aMin(hasta); t += 30) {
+    for (let t = aMin(desde); t + largo <= aMin(hasta); t += 30) {
       if (t < minimo) continue
       const b = equipo.find(
-        (b) => !ocupados.some((o) => o.barberoId === b.id && o.inicio < t + servicio.duracion && t < o.inicio + o.duracion),
+        (b) => !ocupados.some((o) => o.barberoId === b.id && o.inicio < t + largo && t < o.inicio + o.duracion),
       )
       if (b) libres.push({ inicio: t, barberoId: b.id })
     }
