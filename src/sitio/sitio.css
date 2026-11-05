@@ -1332,6 +1332,11 @@
   font-weight: 700;
   font-size: 17px;
 }
+.wa-nota {
+  margin: -4px 0 0;
+  font-size: 13.5px;
+  opacity: 0.75;
+}
 .wa-chat {
   display: flex;
   flex-direction: column;

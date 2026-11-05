@@ -189,6 +189,15 @@ export default function Reservar() {
     return m
   }, [e, suc, servicio, quien, extras, diasAbiertos])
 
+  // Si el día no tiene lugar porque quien atiende está de franco, se dice eso y no "Sin lugar"
+  const deFranco = (d: string) => {
+    const dow = new Date(`${d}T12:00:00`).getDay()
+    const quienes = quien ? equipo.filter((b) => b.id === quien) : equipo
+    if (!quienes.length || !quienes.every((b) => b.franco === dow)) return null
+    return quienes.length === 1 ? `${quienes[0].nombre} no atiende` : 'No atienden'
+  }
+  const sinLugar = (d: string) => deFranco(d) ?? 'Sin lugar'
+
   // Si todavía no hay día elegido, se muestra el primero con lugar
   const diaVisto = dia ?? diasAbiertos.find((d) => libresPorDia[d]) ?? diasAbiertos[0] ?? null
   const libres = useMemo(
@@ -273,8 +282,10 @@ export default function Reservar() {
             </div>
           </section>
 
-          <section className="wa" aria-label="Lo que te llega por WhatsApp">
-            <p className="wa-titulo">Lo que te llega por WhatsApp</p>
+          <section className="wa" aria-label="Ejemplo de los avisos por WhatsApp">
+            <p className="wa-titulo">Así te llegaría por WhatsApp</p>
+            {/* Los avisos todavía no se mandan: es un ejemplo para mostrar el servicio que se suma aparte */}
+            <p className="wa-nota">Ejemplo de los avisos automáticos, que se activan aparte. Esta demo no manda mensajes.</p>
             <div className="wa-chat">
               <p className="wa-dia">Ahora</p>
               <p className="wa-burbuja">
@@ -443,7 +454,7 @@ export default function Reservar() {
                     <span>{d === hoy ? 'Hoy' : fechaCorta(d).split(' ')[0]}</span>
                     <strong>{Number(d.slice(8))}</strong>
                     <small className={elegidos.some((x) => x.precioPorDia) && libresPorDia[d] ? 'dia-precio' : ''}>
-                      {!libresPorDia[d] ? 'Sin lugar' : elegidos.some((x) => x.precioPorDia) ? pesos(precioTotal(d)) : libresPorDia[d] === 1 ? '1 libre' : `${libresPorDia[d]} libres`}
+                      {!libresPorDia[d] ? sinLugar(d) : elegidos.some((x) => x.precioPorDia) ? pesos(precioTotal(d)) : libresPorDia[d] === 1 ? '1 libre' : `${libresPorDia[d]} libres`}
                     </small>
                   </button>
                 ))}
