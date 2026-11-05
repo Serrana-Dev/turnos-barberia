@@ -166,7 +166,7 @@ export default function AgendaMovil({ dia, alcance, ir }: { dia: string; alcance
       {vista === 'calendario' && !cerrado ? (
         <CalendarioMovil dia={dia} barberos={barbero ? [barbero] : equipo} turnos={turnos} />
       ) : cerrado ? (
-        <p className="am-vacio">{alcance === 'todas' ? 'Las dos sucursales cierran' : 'La sucursal cierra'} este día.</p>
+        <p className="am-vacio">{alcance === 'todas' && negocio.sucursales.length > 1 ? 'Las dos sucursales cierran' : negocio.sucursales.length > 1 ? 'La sucursal cierra' : `${negocio.sucursales[0].nombre} cierra`} este día.</p>
       ) : franco ? (
         <p className="am-vacio">
           {barbero!.nombre} tiene franco los {fechaLarga(dia).split(' ')[0]}.

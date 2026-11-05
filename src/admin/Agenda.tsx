@@ -149,13 +149,13 @@ export default function Agenda() {
               </button>
             ))}
           </div>
-          <div className="segmentos" role="tablist" aria-label="Sucursal">
+          {negocio.sucursales.length > 1 && <div className="segmentos" role="tablist" aria-label="Sucursal">
             {(['todas', ...negocio.sucursales.map((s) => s.id)] as Alcance[]).map((s) => (
               <button key={s} role="tab" aria-selected={alcance === s} className={alcance === s ? 'activa' : ''} onClick={() => ir({ suc: s })}>
                 {s === 'todas' ? 'Las dos' : negocio.sucursales.find((x) => x.id === s)!.nombre}
               </button>
             ))}
-          </div>
+          </div>}
         </div>
       </div>
 

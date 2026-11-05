@@ -56,11 +56,11 @@ export default function Caja() {
           <p>{capital(fechaLarga(dia))} · {negocio.sucursales.find((s) => s.id === suc)!.nombre} · {cerrada ? 'caja cerrada' : 'caja abierta'}</p>
         </div>
         <div className="controles">
-          <div className="segmentos" role="tablist" aria-label="Sucursal">
+          {negocio.sucursales.length > 1 && <div className="segmentos" role="tablist" aria-label="Sucursal">
             {negocio.sucursales.map((s) => (
               <button key={s.id} role="tab" aria-selected={suc === s.id} className={suc === s.id ? 'activa' : ''} onClick={() => setSuc(s.id)}>{s.nombre}</button>
             ))}
-          </div>
+          </div>}
           <div className="segmentos">
             <button onClick={() => setDia(sumarDias(dia, -1))} aria-label="Día anterior">←</button>
             <button onClick={() => setDia(hoy)} className={dia === hoy ? 'activa' : ''}>Hoy</button>

@@ -88,13 +88,13 @@ function Panel({ sesion, cerrarSesion }: { sesion: Sesion; cerrarSesion: () => v
             <small>Panel · {negocio.ciudad}</small>
           </span>
         </div>
-        <label className="alcance">
+        {negocio.sucursales.length > 1 && <label className="alcance">
           <span className="oculto">Sucursal</span>
           <select value={alcance} onChange={(ev) => setAlcance(ev.target.value as Alcance)}>
             <option value="todas">Las dos sucursales</option>
             {negocio.sucursales.map((s) => <option key={s.id} value={s.id}>{s.nombre}</option>)}
           </select>
-        </label>
+        </label>}
         <nav className="menu">
           {menuVisible.map(({ a, texto, icono: Icono, fin }) => (
             <NavLink key={a} to={a} end={fin}>

@@ -19,7 +19,7 @@ export const useAdmin = () => useOutletContext<Contexto>()
 
 export const enAlcance = (alcance: Alcance) => (x: { sucursal: SucursalId }) => alcance === 'todas' || x.sucursal === alcance
 export const nombreAlcance = (a: Alcance) =>
-  a === 'todas' ? 'Las dos sucursales' : negocio.sucursales.find((s) => s.id === a)!.nombre
+  a === 'todas' && negocio.sucursales.length > 1 ? 'Las dos sucursales' : a === 'todas' ? negocio.sucursales[0].nombre : negocio.sucursales.find((s) => s.id === a)!.nombre
 
 export function Persona({ b, chico }: { b: Pick<Barbero, 'nombre' | 'tono'>; chico?: boolean }) {
   return (
